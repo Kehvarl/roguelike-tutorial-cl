@@ -1,5 +1,8 @@
 # roguelike-tutorial-cl
 Start implementing a Common Lisp tutorial for the Roguelike Tutorial
+Based on and influenced by these projects:
+  http://rogueliketutorials.com/tutorials/tcod/v2/
+  https://nwforrer.github.io/categories/roguelike-tutorial/
 
 # Tutorial Chapters
 * Part 0 - Setting Up
@@ -8,6 +11,7 @@ Start implementing a Common Lisp tutorial for the Roguelike Tutorial
     * Windows
   * Pre-packaged BLT binaries
   * Atom/SlIMA setup
+
 * Part 1 - Drawing the ‘@’ symbol and moving it around
 * Part 2 - The generic Entity, the render functions, and the map
 * Part 3 - Generating a dungeon
