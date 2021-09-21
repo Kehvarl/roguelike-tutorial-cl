@@ -1,0 +1,6 @@
+.vscode/
+lib/
+*~
+*.fasl
+'#*
+*.lisp-repl
