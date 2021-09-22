@@ -5,13 +5,7 @@ Based on and influenced by these projects:
   https://nwforrer.github.io/categories/roguelike-tutorial/
 
 # Tutorial Chapters
-* Part 0 - Setting Up
-  * Environment setup
-    * Linux/Ubuntu
-    * Windows
-  * Pre-packaged BLT binaries
-  * Atom/SlIMA setup
-
+* ![Part 0 - Setting Up](./docs/part-0.md)
 * Part 1 - Drawing the ‘@’ symbol and moving it around
 * Part 2 - The generic Entity, the render functions, and the map
 * Part 3 - Generating a dungeon
