@@ -43,9 +43,10 @@
 ### Install BeatLibTerminal
   * https://github.com/tommyettinger/BearLibTerminal
   * Known working Windows and Ubuntu Linux builds available in this project's releases
-    * https://github.com/Kehvarl/roguelike-tutorial-cl
+    * https://github.com/Kehvarl/roguelike-tutorial-cl/releases/tag/BearLibTerminal
   * Download and unpack latest release
-  * Copy libBearLibTerminal.so to /usr/lib/libBearLibTerminal.so
+  * For Linux: Copy libBearLibTerminal.so to /usr/lib/libBearLibTerminal.so
+  * For Windows: Copy BearLibTerminal.dll into the same folder as SBCL
 
 ### Download cl-blt and add to quicklisp local-projects
   * `git clone https://github.com/sjl/cl-blt.git ~/quicklisp/local-projects/cl-blt`
