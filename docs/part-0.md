@@ -41,7 +41,9 @@
   * `ln -s ~/roguelike-tutorial-cl/ ~/quicklisp/local-projects/roguelike-tutorial-cl`
 
 ### Install BeatLibTerminal
-  * (https://github.com/tommyettinger/BearLibTerminal)
+  * https://github.com/tommyettinger/BearLibTerminal
+  * Known working Windows and Ubuntu Linux builds available in this project's releases
+    * https://github.com/Kehvarl/roguelike-tutorial-cl
   * Download and unpack latest release
   * Copy libBearLibTerminal.so to /usr/lib/libBearLibTerminal.so
 
