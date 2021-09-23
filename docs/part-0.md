@@ -1,8 +1,12 @@
 ## Part 0
 ## Project Setup
-### Linux/Ubuntu
-* Install Common Lisp (SBCL)
-  * `apt install sbcl`
+### Install Common Lisp
+* For this tutorial, I an using Steel Bank Common Lisp (SBCL)
+  * http://sbcl.org/getting.html
+  * Binaries for multiple architectures are available.  If you have a package manager, use the latest version of SBCL available from that source.
+    * Ubuntu Linux: `apt install sbcl`
+    * Windows 10: Download the 2.0.0 installer from the SBCL website
+      * http://prdownloads.sourceforge.net/sbcl/sbcl-2.0.0-x86-64-windows-binary.msi
 
 ### Install the editor of your choice
   * In this instance I am using Atom
