@@ -32,7 +32,7 @@ Any screenshots or keyboard shorcuts referenced in this tutorial will be drawn f
     * All the examples herein were done using  SLIME 2.26.1 from github
     * https://github.com/slime/slime/releases
   * Configure Atom's SLIMA settings with the path to SBCL and your newly downloaded SLIME instance
-    * ![SLIMA Settings](./screenshots/part-0-slima-settings.png "SLIMA Settings")
+    * ![SLIMA Settings](./screenshots/part-0-slima-settings.png?raw=true "SLIMA Settings")
 
 ### Quicklisp lets us manage libraries easily
 Quicklisp is a library manager for Common Lisp.  It will simplify installation of all dependencies needed for the tutorial.
