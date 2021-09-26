@@ -76,3 +76,6 @@ To interface with Bear Lib Terminal, thus tutorial uses the cl-blt project.  Thi
   * `sbcl` or `rlwrap sbcl`
   * `(ql:quickload :roguelike-tutorial-cl)`
   * `(in-package :roguelike-tutorial-cl)`
+
+
+Ready to go?  ![Proceed to Part 1](part-1.md)
