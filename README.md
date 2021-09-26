@@ -6,7 +6,7 @@ Based on and influenced by these projects:
 
 # Tutorial Chapters
 * ![Part 0 - Setting Up](./docs/part-0.md)
-* Part 1 - Drawing the ‘@’ symbol and moving it around
+* ![Part 1 - Drawing the ‘@’ symbol and moving it around](./docs/part-1.md)
 * Part 2 - The generic Entity, the render functions, and the map
 * Part 3 - Generating a dungeon
 * Part 4 - Field of view
