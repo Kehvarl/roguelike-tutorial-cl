@@ -19,7 +19,7 @@ Open your `roguelike-tutorial-cl.lisp` file and ensure it has the following cont
 ```lisp
 (in-package #:roguelike-tutorial-cl)
 
-(defparameter *game-name* "Common Lisp Roguelike Tutorial"")
+(defparameter *game-name* "Common Lisp Roguelike Tutorial")
 (defparameter *screen-width* 80)
 (defparameter *screen-height* 50)
 
