@@ -13,6 +13,43 @@ We will start with getting the project connected to SLIMA so we have some assist
 * ![Loading your project](../screenshots/part-1-0-load-package.png?raw=true "Loading Package in REPL")
 
 ## Opening a Window
+QuickProject created a main file for us.  In this tutorial that file is named `roguelike-tutorial-cl.lisp`.  If you have a different name for your main file, make note of it and use that anywhere we reference the above filename.
+
+Open your `roguelike-tutorial-cl.lisp` file and ensure it has the following contents:
+```lisp
+(in-package #:roguelike-tutorial-cl)
+
+(defparameter *screen-width* 80)
+(defparameter *screen-height* 50)
+
+(defun draw()
+  (blt:clear)
+  (blt:refresh))
+
+(defun config ()
+  (blt:set "window.resizeable = true")
+  (blt:set "window.size = ~Ax~A" *screen-width* *screen-height*)
+  (blt:set "window.title = Common Lisp Roguelike Tutorial"))
+
+(defun main()
+  (blt:with-terminal
+    (config)
+    (loop :do
+      (draw)
+      (blt:key-case (blt:read)
+                    (:escape (return))
+                    (:close (return))))))
+```
+
+Before we test our code, we need to make our lisp instance aware of it.  Common Lisp doesn't reload the file every time we try to run it, and instead expects we've already applied all our changes to the running system represented by our REPL.
+
+In Atom, we can use the keyboard shortcut `ALT+k` (Sometimes written `M-k`) to "Compile and Load File".  Alternatively, if we've made a change to a single function the command `ALT+c` to "Compile Function".
+
+Press `ALT+K`
+
+In your REPL, type `(main)` and press RETURN
+
+* ![The basic window](../screenshots/part-1-2-blank-window.png?raw=true "Running our project for the first time.")
 
 ## Drawing the @ symbol
 
