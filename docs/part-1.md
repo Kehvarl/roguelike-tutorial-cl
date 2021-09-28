@@ -19,6 +19,7 @@ Open your `roguelike-tutorial-cl.lisp` file and ensure it has the following cont
 ```lisp
 (in-package #:roguelike-tutorial-cl)
 
+(defparameter *game-name* "Common Lisp Roguelike Tutorial"")
 (defparameter *screen-width* 80)
 (defparameter *screen-height* 50)
 
@@ -29,7 +30,7 @@ Open your `roguelike-tutorial-cl.lisp` file and ensure it has the following cont
 (defun config ()
   (blt:set "window.resizeable = true")
   (blt:set "window.size = ~Ax~A" *screen-width* *screen-height*)
-  (blt:set "window.title = Common Lisp Roguelike Tutorial"))
+  (blt:set "window.title = ~A" *game-name*))
 
 (defun main()
   (blt:with-terminal
@@ -45,11 +46,10 @@ Before we test our code, we need to make our lisp instance aware of it.  Common 
 
 In Atom, we can use the keyboard shortcut `ALT+k` (Sometimes written `M-k`) to "Compile and Load File".  Alternatively, if we've made a change to a single function the command `ALT+c` to "Compile Function".
 
-Press `ALT+K`
+* Press `ALT+K`
+* In your REPL, type `(main)` and press RETURN
 
-In your REPL, type `(main)` and press RETURN
-
-* ![The basic window](../screenshots/part-1-2-blank-window.png?raw=true "Running our project for the first time.")
+![The basic window](../screenshots/part-1-2-blank-window.png?raw=true "Running our project for the first time.")
 
 ## Drawing the @ symbol
 
