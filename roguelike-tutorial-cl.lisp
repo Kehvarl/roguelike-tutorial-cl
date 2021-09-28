@@ -2,6 +2,7 @@
 
 (in-package #:roguelike-tutorial-cl)
 
+(defparameter *game-name* "Common Lisp Roguelike Tutorial")
 (defparameter *screen-width* 80)
 (defparameter *screen-height* 50)
 
@@ -14,7 +15,7 @@
 (defun config ()
   (blt:set "window.resizeable = true")
   (blt:set "window.size = ~Ax~A" *screen-width* *screen-height*)
-  (blt:set "window.title = Common Lisp Roguelike Tutorial"))
+  (blt:set "window.title = ~A" *game-name*))
 
 ;; Create a terminal window using the settings in our `config` function.
 ;; Then enter a loop where we draw the screen and check for a keypress
