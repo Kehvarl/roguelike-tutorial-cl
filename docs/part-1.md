@@ -52,6 +52,34 @@ In Atom, we can use the keyboard shortcut `ALT+k` (Sometimes written `M-k`) to "
 ![The basic window](../screenshots/part-1-2-blank-window.png?raw=true "Running our project for the first time.")
 
 ## Drawing the @ symbol
+A blank screen is a boring screen, so now we will place something on it to represent our player.
+
+Edit the `draw` function to match the following
+```lisp
+(defun draw()
+  (blt:clear)
+  (setf (blt:color) (blt:white)
+        (blt:cell-char 10 10) #\@)
+  (blt:refresh))
+```
+
+As you can see we've added a couple of new lines. Specifically, we are using `setf` to  set the value of two things.  In fact this could be done as two separate setf calls like so:
+```lisp
+(defun draw()
+  (blt:clear)
+  (setf (blt:color) (blt:white))
+  (setf (blt:cell-char 10 10) #\@)
+  (blt:refresh))
+```
+
+This may make it a little more clear what we're setting.
+* `(setf (blt:color) (blt:white))` Informs BLT that until otherwise noted, we will draw all characters and symbols in white.
+* `(setf (blt:cell-char 10 10) #\@)` Tells BLT to update the character at cell 10,10 to our new symbol "@".   In Common Lisp, #\@ refers to the @ character itself instead of to a string containing that character.
+
+* Press `ALT+c` (Compile function)
+* In your REPL, type `(main)` and press RETURN
+
+![The first @](../screenshots/part-1-3-first-@.png?raw=true "Drawing a symbol on our screen.")
 
 ## Keyboard Input
 

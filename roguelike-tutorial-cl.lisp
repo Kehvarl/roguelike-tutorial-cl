@@ -9,6 +9,8 @@
 ;; Draw our terminal window
 (defun draw()
   (blt:clear)
+  (setf (blt:color) (blt:white)
+        (blt:cell-char 10 10) #\@)
   (blt:refresh))
 
 ;; Terminal Window Settings.
