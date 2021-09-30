@@ -83,4 +83,54 @@ This may make it a little more clear what we're setting.
 
 ## Keyboard Input
 
+In addition to providing the terminal, BLT can monitor the keyboard for user input for us.  It's actually already doing that in our existing demo:
+```lisp
+(blt:key-case (blt:read)
+  (:escape (return))
+  (:close (return)))
+```
+This fragment does a few things:
+* First, we make a call to `(blt:read)` to get any currently pressed keys
+* Next we pass that result to `(blt:key-case` which is a `case` statement specifically for handling BLT's key events.
+* `blt:key-case` then compared the currently pressed key to our various tests until either one passes or all fail. (eg: `:escape` which represents the ESC key)
+* If one test case passes, the expression after the test is evaluated. (eg: `(return)` to exit our current function).
+
+While it was convenient enough to check for the exit key in our main function, let's move that our to its own `handle-keys` function so we can modify it later.
+
+```Lisp
+(defun handle-keys ()
+  (let ((action nil))
+    (blt:key-case (blt:read)
+                  (:escape (setf action (list :quit t)))
+                  (:close (setf action (list :quit t))))
+    action))
+```
+
+Remember to press `ALT+c` to compile our new function
+
+You will have noticed that this function doesn't just call `(return)` when we hit ESC, instead we return a list containing 2 values:  The keyword `:quit` and the value `t`.  We will modify our `main` function to work with this returned message.
+
+```lisp
+(defun main()
+  (blt:with-terminal
+    (config)
+    (loop :do
+         (draw)
+         (let* ((action (handle-keys))
+                (exit (getf action :quit)))
+           (if exit
+             (return))))))
+```
+
+Be sure you press `ALT+c` to compile our changed function, or `ALT+k` to compile and load the entire file.
+
+Here we have expanded our main loop.  We draw our terminal, then check for a keypress.  If `handle-keys` returns a message of `(:quit t)` then  we exit the loop which nicely terminates the program
+
+Specifically what we are doing is:
+* `(let*`  Bind some variables.  the * version of `let` allows the variables to reference each other.
+*  `(action (handle-keys))`  Assign the output of `handle-keys` to the variable `action`
+* `(exit (getf action :quit))` If our `action` variable contains the `:quit` keyword, get it's value and assign it to our new variable `exit`.  If not then assign `nil` to `exit`.
+* `(if exit (return))` If our `exit` variable is set to `t`, then exit our loop which will end the program.
+
+
 ## Moving Around

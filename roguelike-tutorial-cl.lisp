@@ -19,6 +19,14 @@
   (blt:set "window.size = ~Ax~A" *screen-width* *screen-height*)
   (blt:set "window.title = ~A" *game-name*))
 
+;; Simple keyboard-input handler.
+(defun handle-keys ()
+  (let ((action nil))
+    (blt:key-case (blt:read)
+                  (:escape (setf action (list :quit t)))
+                  (:close (setf action (list :quit t))))
+    action))
+
 ;; Create a terminal window using the settings in our `config` function.
 ;; Then enter a loop where we draw the screen and check for a keypress
 ;; If the user closes the window or presses Escape, we exit.
@@ -28,6 +36,7 @@
     (config)
     (loop :do
          (draw)
-         (blt:key-case (blt:read)
-                       (:escape (return))
-                       (:close (return))))))
+         (let* ((action (handle-keys))
+                (exit (getf action :quit)))
+           (if exit
+             (return))))))
