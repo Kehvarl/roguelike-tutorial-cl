@@ -132,5 +132,20 @@ Specifically what we are doing is:
 * `(exit (getf action :quit))` If our `action` variable contains the `:quit` keyword, get it's value and assign it to our new variable `exit`.  If not then assign `nil` to `exit`.
 * `(if exit (return))` If our `exit` variable is set to `t`, then exit our loop which will end the program.
 
-
 ## Moving Around
+Our project can open a terminal, draw a character on the screen, and receive input from our player.   Now it's time to make something happen so our player doesn't get too bored.
+
+To start with, we'll modify our `draw` function to accept the position at which to place the player character.
+
+```lisp
+(defun draw (player-x player-y)
+  (blt:clear)
+  (setf (blt:color) (blt:white)
+        (blt:cell-char player-x player-y) #\@)
+  (blt:refresh))
+```
+Don't forget to use `ALT+c` to compile our updated function
+
+We've made 2 changes to the draw function:
+* `(defun draw (player-x player-y)`  instead of receiving no parameters, we now expect both the player-x and player-y parameters
+* `(blt:cell-char player-x player-y) #\@)` we have also replaced our hard-coded position with the passed-in parameters.  The draw function will now put the player wherever we want them each frame.
