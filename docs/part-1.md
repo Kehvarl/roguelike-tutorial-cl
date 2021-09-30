@@ -126,4 +126,11 @@ Be sure you press `ALT+c` to compile our changed function, or `ALT+k` to compile
 
 Here we have expanded our main loop.  We draw our terminal, then check for a keypress.  If `handle-keys` returns a message of `(:quit t)` then  we exit the loop which nicely terminates the program
 
+Specifically what we are doing is:
+* `(let*`  Bind some variables.  the * version of `let` allows the variables to reference each other.
+*  `(action (handle-keys))`  Assign the output of `handle-keys` to the variable `action`
+* `(exit (getf action :quit))` If our `action` variable contains the `:quit` keyword, get it's value and assign it to our new variable `exit`.  If not then assign `nil` to `exit`.
+* `(if exit (return))` If our `exit` variable is set to `t`, then exit our loop which will end the program.
+
+
 ## Moving Around
