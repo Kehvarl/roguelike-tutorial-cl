@@ -133,6 +133,8 @@ Specifically what we are doing is:
 * `(if exit (return))` If our `exit` variable is set to `t`, then exit our loop which will end the program.
 
 ## Moving Around
+
+### Making Draw position-aware
 Our project can open a terminal, draw a character on the screen, and receive input from our player.   Now it's time to make something happen so our player doesn't get too bored.
 
 To start with, we'll modify our `draw` function to accept the position at which to place the player character.
@@ -150,6 +152,7 @@ We've made 2 changes to the draw function:
 * `(defun draw (player-x player-y)`  instead of receiving no parameters, we now expect both the player-x and player-y parameters
 * `(blt:cell-char player-x player-y) #\@)` we have also replaced our hard-coded position with the passed-in parameters.  The draw function will now put the player wherever we want them each frame.
 
+### Tracking position and giving Draw what it needs
 Next up we must modify our `main` function to use that new `draw` function.
 
 ```lisp
@@ -165,9 +168,62 @@ Next up we must modify our `main` function to use that new `draw` function.
            (if exit
              (return))))))
 ```
+As ever, `ALT+c` is your friend when you make a change.
 
 In Common Lisp, `loop` is extremely powerful, it's practically a miniature programming language all its own.  The important part for what we're doing is that we can have it initialize and keep track of variables for us: `:with player-x = (/ *screen-width* 2)` creates a variable named `player-x` and starts it out at half our screen width.  `:and  player-y = (/ *screen-height* 2)`  creates another variable, this one named `player-y` with a value of half our screen height.
 
 In the loop's body we have updated our `draw` function to reference the two variables our loop macro is creating for us: `(draw player-x player-y)`.  Now every pass through the loop we'll call draw with whatever the current values of both these variables are.
 
 ![The centered @](../screenshots/part-1-5-centered-@.png?raw=true "Using our enhanced draw function")
+
+### Finally, Movement!
+Now we can get keyboard input, we can draw a character wherever we want, and we can track their position on the screen.   The last part is to bring these together.
+
+First, we change the `handle-keys` function to watch the arrows.
+```lisp
+(defun handle-keys ()
+  (let ((action nil))
+    (blt:key-case (blt:read)
+                  (:up (setf action (list :move (cons 0 -1))))
+                  (:down (setf action (list :move (cons 0 1))))
+                  (:left (setf action (list :move (cons -1 0))))
+                  (:right (setf action (list :move (cons 1 0))))
+                  (:escape (setf action (list :quit t)))
+                  (:close (setf action (list :quit t))))
+    action))
+```
+`ALT+c` will make this modification available to your program.
+
+The only real change here is to add 4 new key checks.  For example: `(:up (setf action (list :move (cons 0 -1))))` watches for the up-arrow key on the keyboard.  If that's pressed we set our action to a list containing the keyword `:move` and a cons-cell holding the desired change in X and Y position.
+
+Now our `main` function needs to do something with this new input possibility
+```lisp
+(defun main()
+  (blt:with-terminal
+    (config)
+    (loop :with player-x = (/ *screen-width* 2)
+          :and  player-y = (/ *screen-height* 2)
+          :do
+         (draw player-x player-y)
+         (let* ((action (handle-keys))
+                (move (getf action :move))
+                (exit (getf action :quit)))
+
+           (if exit
+             (return))
+
+           (when move
+             (incf player-x (car move))
+             (incf player-y (cdr move)))))))
+```
+Once more with feeling: `ALT+c`
+
+If you're keeping track, you'll have noticed that this is a simple change.  We added another variable in our `let*` and we created a block to deal with that variable.
+* `(move (getf action :move))` works exactly like the `:exit` one does.  If there's a list in the message that starts with the given keyword, it returns the rest of the message, otherwise it gives us `nil`.
+* `(when move` - If Move is set to something, do the rest:
+* `(incf player-x (car move))` Add the first part of our Move cons to the player's X coordinate.
+* `(incf player-y (cdr move))` Add the second part of our Move cons to the player's Y coordinate.
+
+And that's it!  Running the game now gives us the exciting opportunity to wander around in the dark.
+
+![Action!](../screenshots/part-1-6-moving-around.gif?raw=true "Interactive at last")

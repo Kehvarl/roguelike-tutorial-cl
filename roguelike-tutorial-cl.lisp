@@ -23,6 +23,10 @@
 (defun handle-keys ()
   (let ((action nil))
     (blt:key-case (blt:read)
+                  (:up (setf action (list :move (cons 0 -1))))
+                  (:down (setf action (list :move (cons 0 1))))
+                  (:left (setf action (list :move (cons -1 0))))
+                  (:right (setf action (list :move (cons 1 0))))
                   (:escape (setf action (list :quit t)))
                   (:close (setf action (list :quit t))))
     action))
@@ -39,6 +43,12 @@
           :do
          (draw player-x player-y)
          (let* ((action (handle-keys))
+                (move (getf action :move))
                 (exit (getf action :quit)))
+
            (if exit
-             (return))))))
+             (return))
+
+           (when move
+             (incf player-x (car move))
+             (incf player-y (cdr move)))))))
