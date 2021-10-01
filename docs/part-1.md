@@ -149,3 +149,25 @@ Don't forget to use `ALT+c` to compile our updated function
 We've made 2 changes to the draw function:
 * `(defun draw (player-x player-y)`  instead of receiving no parameters, we now expect both the player-x and player-y parameters
 * `(blt:cell-char player-x player-y) #\@)` we have also replaced our hard-coded position with the passed-in parameters.  The draw function will now put the player wherever we want them each frame.
+
+Next up we must modify our `main` function to use that new `draw` function.
+
+```lisp
+(defun main()
+  (blt:with-terminal
+    (config)
+    (loop :with player-x = (/ *screen-width* 2)
+          :and  player-y = (/ *screen-height* 2)
+          :do
+         (draw player-x player-y)
+         (let* ((action (handle-keys))
+                (exit (getf action :quit)))
+           (if exit
+             (return))))))
+```
+
+In Common Lisp, `loop` is extremely powerful, it's practically a miniature programming language all its own.  The important part for what we're doing is that we can have it initialize and keep track of variables for us: `:with player-x = (/ *screen-width* 2)` creates a variable named `player-x` and starts it out at half our screen width.  `:and  player-y = (/ *screen-height* 2)`  creates another variable, this one named `player-y` with a value of half our screen height.
+
+In the loop's body we have updated our `draw` function to reference the two variables our loop macro is creating for us: `(draw player-x player-y)`.  Now every pass through the loop we'll call draw with whatever the current values of both these variables are.
+
+![The centered @](../screenshots/part-1-5-centered-@.png?raw=true "Using our enhanced draw function")

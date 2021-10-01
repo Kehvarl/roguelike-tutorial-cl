@@ -34,8 +34,10 @@
 (defun main()
   (blt:with-terminal
     (config)
-    (loop :do
-         (draw)
+    (loop :with player-x = (/ *screen-width* 2)
+          :and  player-y = (/ *screen-height* 2)
+          :do
+         (draw player-x player-y)
          (let* ((action (handle-keys))
                 (exit (getf action :quit)))
            (if exit
