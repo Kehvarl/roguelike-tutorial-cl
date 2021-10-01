@@ -7,10 +7,10 @@
 (defparameter *screen-height* 50)
 
 ;; Draw our terminal window
-(defun draw()
+(defun draw(player-x player-y)
   (blt:clear)
   (setf (blt:color) (blt:white)
-        (blt:cell-char 10 10) #\@)
+        (blt:cell-char player-x player-y) #\@)
   (blt:refresh))
 
 ;; Terminal Window Settings.
