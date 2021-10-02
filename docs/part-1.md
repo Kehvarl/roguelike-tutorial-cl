@@ -227,3 +227,5 @@ If you're keeping track, you'll have noticed that this is a simple change.  We a
 And that's it!  Running the game now gives us the exciting opportunity to wander around in the dark.
 
 ![Action!](../screenshots/part-1-6-moving-around.gif?raw=true "Interactive at last")
+
+![Complete Part-1 Code listing](https://github.com/Kehvarl/roguelike-tutorial-cl/blob/part-1/roguelike-tutorial-cl.lisp)
