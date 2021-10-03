@@ -8,4 +8,5 @@
   :serial t
   :depends-on (#:cl-blt)
   :components ((:file "package")
+               (:file "entity")
                (:file "roguelike-tutorial-cl")))

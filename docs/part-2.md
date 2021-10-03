@@ -125,3 +125,39 @@ We've also defined an NPC character in exactly the same fashion, allowing us to 
   * If you thought that this would break because we have a variable named `move` and a function named `move`, then welcome to another of Lisp's surprises.  If staring at this makes you deeply uncomfortable, feel free to rename things (perhaps `action-move` for the `:move` result from `handle-keys` returned `action`?)
 
 ![Dynamic Drawing!](../screenshots/part-2-4-two-entities.gif?raw=true "Achievement Unlocked: Drawing an arbitrary number of entities.")
+
+### Cleaning up our Main file
+Before we move on to the map, let's do some cleanup.  Having everything in one file is fine for testing and prototyping, but it will quickly become cluttered.  To help manage that clutter, we're going to move all of our new entity-related code to an `entity.lisp` file.
+
+* Start by creating a new file and naming it `entity.lisp`.
+* The first line needs to be `(in-package #:roguelike-tutorial-cl)` to inform Lisp that the contents of this file belong in our project's package.
+* Next up we will move the parts of `entity` out of our main file and into the new file:
+  * ```lisp
+  (defclass entity ()
+    ((x :initarg :x :accessor entity/x)
+     (y :initarg :y :accessor entity/y)
+     (char :initarg :char :accessor entity/char)
+     (color :initarg :color :accessor entity/color)))
+
+  (defmethod move ((e entity) dx dy)
+    (incf (entity/x e) dx)
+    (incf (entity/y e) dy))
+
+  (defmethod draw ((e entity))
+    (with-slots (x y char color) e
+      (setf (blt:color) color
+            (blt:cell-char x y) char)))
+    ```
+
+* We'll also update the `roguelike-tutorial-cl.asd` file to tell Lisp what order to load files in when we load the package.
+  * ```lisp
+  :components ((:file "package")
+               (:file "entity")
+               (:file "roguelike-tutorial-cl")))
+  ```
+
+Don't forget to compile and load all your changes, and then run the project to make sure everything still works.
+
+## The Game Map
+### The Tile Class
+### The Game Map Class
