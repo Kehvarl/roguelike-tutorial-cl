@@ -71,7 +71,10 @@ Of course, now we have that old `draw` function that we just removed from the ru
 
 As you can see, we've renamed our old `draw` function `render-all`, and changed some things about it:
 * `(defun render-all (entities)`  Instead of our player's position, we expect a list of Entity instances
-* `(mapc #'draw entities)` Instead of just drawing our player character, we are using `mapc` to call the `draw` method on every `entity` in our list of entities.  When we reference a method, we use the `#'name` form to take the name of a function and return that function.
+* `(mapc #'draw entities)` Is deceptively simple and powerful:
+  * `mapc` - the Common Lisp "map": command:  Apply the given function to each item in a list
+  * `#'draw`  -The function to call.  mapc expects a function, not a function name, so we use the sharp-quote #' format to get the function named draw for mapc to use.
+  * `entities` - The list containing the items (in this case instances of the entity class) to which we will apply our function.
 
 
 One last change and we'll run the game again.  This one is fairly large, and introduces some new concepts, but it's not too complicated once we break it down:
