@@ -157,3 +157,7 @@ Before we move on to the map, let's do some cleanup.  Having everything in one f
   ```
 
 Don't forget to compile and load all your changes, and then run the project to make sure everything still works.
+
+## The Game Map
+### The Tile Class
+### The Game Map Class
