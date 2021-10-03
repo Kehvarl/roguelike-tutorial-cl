@@ -110,7 +110,7 @@ Our first change is to remove the `player-x` and `player-y` variables.  Instead 
 * `:y (/ *screen-height* 2)` Set the `y` slot to half the screen height (Thus centering our Player Character on the screen).
 * `:char #\@` We're still using the "@" character for our player
 * `:color (blt:white))` And we want to display the character in white.
-```
+
 
 We've also defined an NPC character in exactly the same fashion, allowing us to display two entities on the screen.
 
@@ -119,3 +119,5 @@ We've also defined an NPC character in exactly the same fashion, allowing us to 
 * `(render-all entities)` Instead of drawing just the player, we'll use that nice `render-all` function we created and give it our list of entities to draw every round.
 
 * `(when move (move player (car move) (cdr move)))` We also have a useful `move` method for our entities, so when the player presses a movement key, we can just pass the player's entity and the desired change in location to `move` and let it handle interacting with our object.
+
+![Dynamic Drawing!](../screenshots/part-2-4-two-entities.gif?raw=true "Achievement Unlocked: Drawing an arbitrary number of entities.")
