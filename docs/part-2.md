@@ -119,5 +119,6 @@ We've also defined an NPC character in exactly the same fashion, allowing us to 
 * `(render-all entities)` Instead of drawing just the player, we'll use that nice `render-all` function we created and give it our list of entities to draw every round.
 
 * `(when move (move player (car move) (cdr move)))` We also have a useful `move` method for our entities, so when the player presses a movement key, we can just pass the player's entity and the desired change in location to `move` and let it handle interacting with our object.
+  * If you thought that this would break because we have a variable named `move` and a function named `move`, then welcome to another of Lisp's surprises.  If staring at this makes you deeply uncomfortable, feel free to rename things (perhaps `action-move` for the `:move` result from `handle-keys` returned `action`?)
 
 ![Dynamic Drawing!](../screenshots/part-2-4-two-entities.gif?raw=true "Achievement Unlocked: Drawing an arbitrary number of entities.")
