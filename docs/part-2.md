@@ -159,5 +159,58 @@ Before we move on to the map, let's do some cleanup.  Having everything in one f
 Don't forget to compile and load all your changes, and then run the project to make sure everything still works.
 
 ## The Game Map
+Now that we have a way to draw entities and move the player, let's give them somewhere to explore.
+
+Rather than clutter our main file again, we'll create a new game-map.lisp right from the start.  Create that new file and update your .ASD like so:
+
+New File:  game-map.lisp
+```lisp
+(in-package #:roguelike-tutorial-cl)
+```
+
+roguelike-tutorial-cl.asd
+```lisp
+(asdf:defsystem #:roguelike-tutorial-cl
+  :description "A Common-Lisp implementation of the 2020 Python/TCOD Roguelike Tutorial"
+  :author "Kehvarl <Kehvarl@Kehvarl.com>"
+  :license  "CC-1"
+  :version "0.0.1"
+  :serial t
+  :depends-on (#:cl-blt)
+  :components ((:file "package")
+               (:file "entity")
+               (:file "game-map")
+               (:file "roguelike-tutorial-cl")))
+```
+
 ### The Tile Class
+Our map is based around the concept of tiles.  Each tile represents a discreet place in the world which could contain something.  To start with, we'll just define each tile's ability to block movement or sight.
+
+```lisp
+(defclass tile ()
+  ((blocked :initarg :blocked
+            :accessor tile/blocked
+            :initform nil)
+   (block-sight :initarg :block-sight
+                :accessor tile/block-sight
+                :initform nil)))
+```
+Here we define a class to represent our tiles.   We do introduce one new concept which is worth reviewing:
+* `:initform nil` Describes the initial state of a tile's slot if no initarg value is given during a `make-instance` call.
+
+Speaking of `initialize-instance`, right below your class definition, add this method:
+```lisp
+(defmethod initialize-instance :after ((tile tile) &rest initargs)
+  (declare (ignore initargs))
+  (with-slots (blocked block-sight) tile
+    (if (null block-sight)
+        (setf block-sight blocked))))
+```
+Here we're defining what's called an "after method" which will be run after the parent code completes.  You can actually define these for any methods on your class.
+* `(defmethod initialize-instance :after ((tile tile) &rest initargs)` - After calling `initialize-instance` on the `tile` class, run this method.
+* `(declare (ignore initargs))`  We need to accept an `&rest` parameter to hold everything that was passed to `initialize-instance`, but we don't need them.  This tells Lisp that we won't be using those parameters.
+* `(with-slots (blocked block-sight) tile` - This is the same `with-slots` we used for our `move` method. It's just a macro that saves us from typing every accessor.
+* `(if (null block-sight) (setf block-sight blocked))`  If we didn't set `block-sight` to an explicit value, then we will set it to the same value as the `blocked` slot.
+
+
 ### The Game Map Class
