@@ -198,6 +198,19 @@ Our map is based around the concept of tiles.  Each tile represents a discreet p
 Here we define a class to represent our tiles.   We do introduce one new concept which is worth reviewing:
 * `:initform nil` Describes the initial state of a tile's slot if no initarg value is given during a `make-instance` call.
 
+Speaking of `initialize-instance`, right below your class definition, add this method:
+```lisp
+(defmethod initialize-instance :after ((tile tile) &rest initargs)
+  (declare (ignore initargs))
+  (with-slots (blocked block-sight) tile
+    (if (null block-sight)
+        (setf block-sight blocked))))
+```
+Here we're defining what's called an "after method" which will be run after the parent code completes.  You can actually define these for any methods on your class.
+* `(defmethod initialize-instance :after ((tile tile) &rest initargs)` - After calling `initialize-instance` on the `tile` class, run this method.
+* `(declare (ignore initargs))`  We need to accept an `&rest` parameter to hold everything that was passed to `initialize-instance`, but we don't need them.  This tells Lisp that we won't be using those parameters.
+* `(with-slots (blocked block-sight) tile` - This is the same `with-slots` we used for our `move` method. It's just a macro that saves us from typing every accessor.
+* `(if (null block-sight) (setf block-sight blocked))`  If we didn't set `block-sight` to an explicit value, then we will set it to the same value as the `blocked` slot.
 
 
 ### The Game Map Class
