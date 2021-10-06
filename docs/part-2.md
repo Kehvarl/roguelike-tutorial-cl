@@ -212,5 +212,36 @@ Here we're defining what's called an "after method" which will be run after the 
 * `(with-slots (blocked block-sight) tile` - This is the same `with-slots` we used for our `move` method. It's just a macro that saves us from typing every accessor.
 * `(if (null block-sight) (setf block-sight blocked))`  If we didn't set `block-sight` to an explicit value, then we will set it to the same value as the `blocked` slot.
 
-
 ### The Game Map Class
+Next up we define the actual Game Map class.  For our purposes a Game Map holds an array of tiles that measures (Width)x(height) cells.
+
+```lisp
+(defclass game-map ()
+  ((width :initarg :w :accessor game-map/w)
+   (height :initarg :h :accessor game-map/h)
+   (tile :accessor game-map/tiles)))
+
+(defmethod initialize-instance :after ((map game-map) &rest initargs)
+  (declare (ignore initargs))
+  (setf (game-map/tiles map) (make-array (list (game-map/w map)
+                                               (game-map/h map)))))
+```
+The only new thing we're introducing here are arrays.
+* `(make-array (list (game-map/w map) (game-map/h map))))` Creates an empty array measuring W by H cells.
+
+Unfortunately, an empty array does not a map map, so let's create a method to help set up a new map:
+```lisp
+(defmethod initialize-tiles ((map game-map))
+  (dotimes (y (game-map/h map))
+    (dotimes (x (came-map/w map))
+       (setf (aref (game-map/tiles map) x y) (make-instance 'tile)))))
+```
+
+There's not much new here, but we'll take it line-by-line just for clarity:
+* `(defmethod initialize-tiles ((map game-map))` Create a new method named `initialize-tiles` which operates on the `game-map` class.  Refer to the target game-map as `map`.
+* `(dotimes (y (game-map/h map))` Loop over the body for the number of lines tall our map is.   Capture the current line as our Y value
+* `(dotimes (x (game-map/w map))` Loop over the body for the number of cells in a line.  Capture the current cell as our X value
+* `(setf (aref (game-map/tiles map) x y) (make-instance 'tile)))))`
+  * `setf` we already know
+  * `(aref (game-map/tiles map) x y) ` Here we use `aref` to reference into an array.  Specifically we will look in the `tiles` array stored in our `map`, and within that array we will specify the tile at `x`, `y`.
+  * `(make-instance 'tile)` We have already encountered `make-instance`, here we're just calling it on our `tile` class with no parameters to make non-blocking tiles everywhere.
