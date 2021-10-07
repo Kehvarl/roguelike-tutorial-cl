@@ -272,3 +272,30 @@ To differentiate between walls and floors, we'll draw them in 2 different colors
 This creates a list of keyword/value pairs that we can lookup easily.
 * `:dark-wall (blt:rgba 0 0 100)`  The keyword `:dark-wall` will return the color value for that type of tile
   * `(blt:rgba 0 0 100)` Calls the `rgba` function from our BLT library to generate a color from the provided Red, Green, and Blue values.  The fourth channel (Alpha) would control transparency.
+
+Now let's rewrite our `render-all` to handle that fancy map class we made.
+```lisp
+(defun render-all (entities map)
+  (blt:clear)
+  (dotimes (y (game-map/h map))
+    (dotimes (x (game-map/w map))
+       (let* ((tile (aref (game-map/tiles map) x y))
+              (wall (tile/blocked tile)))
+         (if wall
+           (setf (blt:background-color) (getf *color-map* :dark-wall))
+           (setf (blt:background-color) (getf *color-map* :dark-ground))))
+       (setf (blt:cell-char x y) #\Space)))
+
+  (mapc #'draw entities)
+
+  (setf (blt:background-color) (blt:black))
+  (blt:refresh))
+```
+
+Once more we see our nested `dotimes` loop to iterate through all the cells in our map. Deep inside our loop, we're using `let*` to get each cell's tile, and also check to see if that tile is `blocked` which would indicate that it's a wall.
+* `(dotimes (y (game-map/h map)) (dotimes (x (game-map/w map))` That same `dotimes` loop we used to iterate through all the cells and set the tiles when we created the map.
+* `(let* ((tile (aref (game-map/tiles map) x y)) (wall (tile/blocked tile)))` Here we're using `let*` to set a couple of local variables inside our loop.  The first is just the `tile` object held in the current map cell.  The second is the result of checking if that tile is `blocked`, which would make it a wall.
+* `(if wall`
+  * `(setf (blt:background-color) (getf *color-map* :dark-wall))` If the cell is blocked, then we use `getf` to find the `:dark-wall` cell color and set that as the current background color for symbols in BLT.
+  * `(setf (blt:background-color) (getf *color-map* :dark-ground))))` Otherwise we look up the `:dark-ground` color and use that.
+* `(setf (blt:cell-char x y) #\Space)))` Write a space to the terminal to represent its tile.
