@@ -12,10 +12,25 @@
   (blt:set "window.size = ~Ax~A" *screen-width* *screen-height*)
   (blt:set "window.title = ~A" *game-name*))
 
+;; Tile Colors to help distinguish things
+(defparameter *color-map* (list :dark-wall (blt:rgba 0 0 100)
+                                :dark-ground (blt:rgba 50 50 150)))
+
 ;; Render (draw) our terminal window
-(defun render-all (entities)
+(defun render-all (entities map)
   (blt:clear)
+  (dotimes (y (game-map/h map))
+    (dotimes (x (game-map/w map))
+       (let* ((tile (aref (game-map/tiles map) x y))
+              (wall (tile/blocked tile)))
+         (if wall
+           (setf (blt:background-color) (getf *color-map* :dark-wall))
+           (setf (blt:background-color) (getf *color-map* :dark-ground))))
+       (setf (blt:cell-char x y) #\Space)))
+
   (mapc #'draw entities)
+
+  (setf (blt:background-color) (blt:black))
   (blt:refresh))
 
 ;; Simple keyboard-input handler.

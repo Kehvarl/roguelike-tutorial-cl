@@ -245,3 +245,59 @@ There's not much new here, but we'll take it line-by-line just for clarity:
   * `setf` we already know
   * `(aref (game-map/tiles map) x y) ` Here we use `aref` to reference into an array.  Specifically we will look in the `tiles` array stored in our `map`, and within that array we will specify the tile at `x`, `y`.
   * `(make-instance 'tile)` We have already encountered `make-instance`, here we're just calling it on our `tile` class with no parameters to make non-blocking tiles everywhere.
+
+A big empty map isn't really much better than no map at all so for the time being we'll cheat and add a few walls.   
+```lisp
+(defmethod initialize-tiles ((map game-map))
+  (dotimes (y (game-map/h map))
+    (dotimes (x (came-map/w map))
+       (setf (aref (game-map/tiles map) x y) (make-instance 'tile))))
+  (setf (tile/blocked (aref (game-map/tiles map) 30 22)) t)
+  (setf (tile/block-sight (aref (game-map/tiles map) 30 22)) t)
+  (setf (tile/blocked (aref (game-map/tiles map) 31 22)) t)
+  (setf (tile/block-sight (aref (game-map/tiles map) 31 22)) t)
+  (setf (tile/blocked (aref (game-map/tiles map) 32 22)) t)
+  (setf (tile/block-sight (aref (game-map/tiles map) 32 22)) t))
+```  
+We'll create a line of wall that's 3 cells long near the center of our map.  This is just a series of `setf` calls like we've used multiple times now.
+
+### Rendering
+We have a map that we never use, so let's first teach our renderer how to display the map, and then we'll actually use it!  Pop back over to our main file: `roguelike-tutorial-cl.lisp` unless you have made your own changes.
+
+To differentiate between walls and floors, we'll draw them in 2 different colors.  To make it easy to change that later, we'll define a list that holds the colors to use.
+```lisp
+(defparameter *color-map* (list :dark-wall (blt:rgba 0 0 100)
+                                :dark-ground (blt:rgba 50 50 150)))
+```
+This creates a list of keyword/value pairs that we can lookup easily.
+* `:dark-wall (blt:rgba 0 0 100)`  The keyword `:dark-wall` will return the color value for that type of tile
+  * `(blt:rgba 0 0 100)` Calls the `rgba` function from our BLT library to generate a color from the provided Red, Green, and Blue values.  The fourth channel (Alpha) would control transparency.
+
+Now let's rewrite our `render-all` to handle that fancy map class we made.
+```lisp
+(defun render-all (entities map)
+  (blt:clear)
+  (dotimes (y (game-map/h map))
+    (dotimes (x (game-map/w map))
+       (let* ((tile (aref (game-map/tiles map) x y))
+              (wall (tile/blocked tile)))
+         (if wall
+           (setf (blt:background-color) (getf *color-map* :dark-wall))
+           (setf (blt:background-color) (getf *color-map* :dark-ground))))
+       (setf (blt:cell-char x y) #\Space)))
+
+  (mapc #'draw entities)
+
+  (setf (blt:background-color) (blt:black))
+  (blt:refresh))
+```
+
+There are a lot of changes here, and some stuff left alone.  The salient bits are:
+
+* `(defun render-all (entities map)` Modify our `render-all` function to accept the map we need to draw.
+* `(dotimes (y (game-map/h map)) (dotimes (x (game-map/w map))` That same `dotimes` loop we used to iterate through all the cells and set the tiles when we created the map.
+* `(let* ((tile (aref (game-map/tiles map) x y)) (wall (tile/blocked tile)))` Here we're using `let*` to set a couple of local variables inside our loop.  The first is just the `tile` object held in the current map cell.  The second is the result of checking if that tile is `blocked`, which would make it a wall.
+* `(if wall`
+  * `(setf (blt:background-color) (getf *color-map* :dark-wall))` If the cell is blocked, then we use `getf` to find the `:dark-wall` cell color and set that as the current background color for symbols in BLT.
+  * `(setf (blt:background-color) (getf *color-map* :dark-ground))))` Otherwise we look up the `:dark-ground` color and use that.
+* `(setf (blt:cell-char x y) #\Space)))` Write a space to the terminal to represent its tile.
