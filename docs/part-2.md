@@ -260,3 +260,15 @@ A big empty map isn't really much better than no map at all so for the time bein
   (setf (tile/block-sight (aref (game-map/tiles map) 32 22)) t))
 ```  
 We'll create a line of wall that's 3 cells long near the center of our map.  This is just a series of `setf` calls like we've used multiple times now.
+
+### Rendering
+We have a map that we never use, so let's first teach our renderer how to display the map, and then we'll actually use it!  Pop back over to our main file: `roguelike-tutorial-cl.lisp` unless you have made your own changes.
+
+To differentiate between walls and floors, we'll draw them in 2 different colors.  To make it easy to change that later, we'll define a list that holds the colors to use.
+```lisp
+(defparameter *color-map* (list :dark-wall (blt:rgba 0 0 100)
+                                :dark-ground (blt:rgba 50 50 150)))
+```
+This creates a list of keyword/value pairs that we can lookup easily.
+* `:dark-wall (blt:rgba 0 0 100)`  The keyword `:dark-wall` will return the color value for that type of tile
+  * `(blt:rgba 0 0 100)` Calls the `rgba` function from our BLT library to generate a color from the provided Red, Green, and Blue values.  The fourth channel (Alpha) would control transparency.

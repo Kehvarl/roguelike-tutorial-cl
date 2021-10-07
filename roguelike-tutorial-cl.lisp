@@ -12,6 +12,10 @@
   (blt:set "window.size = ~Ax~A" *screen-width* *screen-height*)
   (blt:set "window.title = ~A" *game-name*))
 
+;; Tile Colors to help distinguish things
+(defparameter *color-map* (list :dark-wall (blt:rgba 0 0 100)
+                                :dark-ground (blt:rgba 50 50 150)))
+
 ;; Render (draw) our terminal window
 (defun render-all (entities)
   (blt:clear)
