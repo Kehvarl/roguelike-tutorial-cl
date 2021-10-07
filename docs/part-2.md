@@ -292,7 +292,9 @@ Now let's rewrite our `render-all` to handle that fancy map class we made.
   (blt:refresh))
 ```
 
-Once more we see our nested `dotimes` loop to iterate through all the cells in our map. Deep inside our loop, we're using `let*` to get each cell's tile, and also check to see if that tile is `blocked` which would indicate that it's a wall.
+There are a lot of changes here, and some stuff left alone.  The salient bits are:
+
+* `(defun render-all (entities map)` Modify our `render-all` function to accept the map we need to draw.
 * `(dotimes (y (game-map/h map)) (dotimes (x (game-map/w map))` That same `dotimes` loop we used to iterate through all the cells and set the tiles when we created the map.
 * `(let* ((tile (aref (game-map/tiles map) x y)) (wall (tile/blocked tile)))` Here we're using `let*` to set a couple of local variables inside our loop.  The first is just the `tile` object held in the current map cell.  The second is the result of checking if that tile is `blocked`, which would make it a wall.
 * `(if wall`
