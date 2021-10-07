@@ -245,3 +245,18 @@ There's not much new here, but we'll take it line-by-line just for clarity:
   * `setf` we already know
   * `(aref (game-map/tiles map) x y) ` Here we use `aref` to reference into an array.  Specifically we will look in the `tiles` array stored in our `map`, and within that array we will specify the tile at `x`, `y`.
   * `(make-instance 'tile)` We have already encountered `make-instance`, here we're just calling it on our `tile` class with no parameters to make non-blocking tiles everywhere.
+
+A big empty map isn't really much better than no map at all so for the time being we'll cheat and add a few walls.   
+```lisp
+(defmethod initialize-tiles ((map game-map))
+  (dotimes (y (game-map/h map))
+    (dotimes (x (came-map/w map))
+       (setf (aref (game-map/tiles map) x y) (make-instance 'tile))))
+  (setf (tile/blocked (aref (game-map/tiles map) 30 22)) t)
+  (setf (tile/block-sight (aref (game-map/tiles map) 30 22)) t)
+  (setf (tile/blocked (aref (game-map/tiles map) 31 22)) t)
+  (setf (tile/block-sight (aref (game-map/tiles map) 31 22)) t)
+  (setf (tile/blocked (aref (game-map/tiles map) 32 22)) t)
+  (setf (tile/block-sight (aref (game-map/tiles map) 32 22)) t))
+```  
+We'll create a line of wall that's 3 cells long near the center of our map.  This is just a series of `setf` calls like we've used multiple times now.
