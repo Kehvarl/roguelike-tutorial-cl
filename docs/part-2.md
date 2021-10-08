@@ -250,7 +250,7 @@ A big empty map isn't really much better than no map at all so for the time bein
 ```lisp
 (defmethod initialize-tiles ((map game-map))
   (dotimes (y (game-map/h map))
-    (dotimes (x (came-map/w map))
+    (dotimes (x (game-map/w map))
        (setf (aref (game-map/tiles map) x y) (make-instance 'tile))))
   (setf (tile/blocked (aref (game-map/tiles map) 30 22)) t)
   (setf (tile/block-sight (aref (game-map/tiles map) 30 22)) t)
@@ -301,3 +301,54 @@ There are a lot of changes here, and some stuff left alone.  The salient bits ar
   * `(setf (blt:background-color) (getf *color-map* :dark-wall))` If the cell is blocked, then we use `getf` to find the `:dark-wall` cell color and set that as the current background color for symbols in BLT.
   * `(setf (blt:background-color) (getf *color-map* :dark-ground))))` Otherwise we look up the `:dark-ground` color and use that.
 * `(setf (blt:cell-char x y) #\Space)))` Write a space to the terminal to represent its tile.
+
+### Using the map
+That was a lot of work with no real payoff, so let's fix that!  We'll make some changes to our `main` function to use the new map class that we've created and tell the upgraded renderer to draw walls for us.
+
+First:  at the top of `roguelike-tutorial-cl.lisp`, you'll add some new variables to help us deal with the map:
+```lisp
+(defparameter *map-width* 80)
+(defparameter *map-height* 45)
+
+(defparameter *map* nil)
+```
+
+Next we modify `main` itself:
+```lisp
+(defun main()
+  (blt:with-terminal
+    (config)
+    (setf *map* (make-instance 'game-map :w *map-width* :h *map-height*))
+    (initialize-tiles *map*)
+    (loop
+      :with player = (make-instance 'entity
+                                    :x (/ *screen-width* 2)
+                                    :y (/ *screen-height* 2)
+                                    :char #\@
+                                    :color (blt:white))
+      :and  npc = (make-instance 'entity
+                                 :x (- (/ *screen-width* 2) 5)
+                                 :y (/ *screen-height* 2)
+                                 :char #\@
+                                 :color (blt:yellow))
+      :with entities = (list player npc)
+      :do
+        (render-all entities *map*)
+        (let* ((action (handle-keys))
+               (move (getf action :move))
+               (exit (getf action :quit)))
+
+          (if exit
+            (return))
+
+          (when move
+            (move player (car move) (cdr move)))))))
+```
+`main` is getting rather long, so I'll call out the changes:
+* `(setf *map* (make-instance 'game-map :w *map-width* :h *map-height*))` - Create an empty map to work with
+* `(initialize-tiles *map*)` - Initialize the map to something we can display
+* `(render-all entities *map*)` - Pass the map to our upgraded `render-all` so it has something to draw.
+
+Don't forget to `ALT+c` or `ALT+k` all your changes, and in your REPL run `(main)` to play the exciting new game of exploration!
+
+![A map to explore](../screenshots/part-2-6-map.gif?raw=true "Here there be ASCII")
