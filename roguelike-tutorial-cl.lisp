@@ -6,6 +6,11 @@
 (defparameter *screen-width* 80)
 (defparameter *screen-height* 50)
 
+(defparameter *map-width* 80)
+(defparameter *map-height* 45)
+
+(defparameter *map* nil)
+
 ;; Terminal Window Settings.
 (defun config ()
   (blt:set "window.resizeable = true")
@@ -52,6 +57,8 @@
 (defun main()
   (blt:with-terminal
     (config)
+    (setf *map* (make-instance 'game-map :w *map-width* :h *map-height*))
+    (initialize-tiles *map*)
     (loop
       :with player = (make-instance 'entity
                                     :x (/ *screen-width* 2)
@@ -65,7 +72,7 @@
                                  :color (blt:yellow))
       :with entities = (list player npc)
       :do
-        (render-all entities)
+        (render-all entities *map*)
         (let* ((action (handle-keys))
                (move (getf action :move))
                (exit (getf action :quit)))
