@@ -352,3 +352,25 @@ Next we modify `main` itself:
 Don't forget to `ALT+c` or `ALT+k` all your changes, and in your REPL run `(main)` to play the exciting new game of exploration!
 
 ![A map to explore](../screenshots/part-2-6-map.gif?raw=true "Here there be ASCII")
+
+### Collision Detection
+We have walls now, but unless our player character is a ghost, we should keep them from walking through those nice solid walls.
+
+The first thing we'll do is add a method to our `game-map` that checks if a given cell is a wall.  Or, since we might have all sorts of interesting movement-blocking cells, let's check if it blocks movement:
+```lisp
+(defmethod blocked-p ((map game-map) x y)
+  (tile/blocked (aref (game-map/tiles map) x y)))
+```
+
+This is a fairly simple method that acts on our `game-map` class and expects an `x` and `y` parameter.  Then it just returns the current `blocked` state of the cell at `x,y`.   The name: `blocked-p` follows a Lisp tradition.  We use the `-p` suffix to indicate that a function is a "predicate" which just means "asks a question".  In this case "is it blocked?"  or "blocked-p?".
+
+While there are lots of ways we could make walls more solid, to start with we'll modify our `move` check in our main function:
+
+```lisp
+(when move
+  (unless (blocked-p *map*
+                     (+ (entity/x player) (car move))
+                     (+ (entity/y player) (cdr move)))
+    (move player (car move) (cdr move))))))))
+```
+Here we introduce `unless` which is basically `if not`.  We check the position the player will move into, and if it's not a blocked position, we tell the player entity to move to the new location.

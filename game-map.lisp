@@ -35,3 +35,6 @@
   (setf (tile/block-sight (aref (game-map/tiles map) 31 22)) t)
   (setf (tile/blocked (aref (game-map/tiles map) 32 22)) t)
   (setf (tile/block-sight (aref (game-map/tiles map) 32 22)) t))
+
+(defmethod blocked-p ((map game-map) x y)
+  (tile/blocked (aref (game-map/tiles map) x y)))
