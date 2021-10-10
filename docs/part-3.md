@@ -13,3 +13,26 @@ This was a one-line change.   Specifically, we changed our `make-instance` and a
 If you compile this change and run your code, the player character will now be trapped in one place forever.
 
 ![All walls and nowhere to go](../screenshots/part-3-1-all-walls.png?raw=true "Instant Claustrophobia")
+
+## Lisp's superpower
+When we initialize our game-map, and then again when we render it, we're doing the same nested loop.   As we add more features, we're going to use this construct more in our program.
+Rather than writing it every time, or creating a function that can only do one thing with our map, we're going to leverage Lisp's super power to generate code for us anytime we need it:  the macro.  
+
+In our `game-map.lisp` file let's create a macro to handle iterating over tiles in our map.
+```lisp
+
+(defmacro map-tiles-loop ((map tile-val
+                           &key (row-val (gensym)) (col-val (gensym))
+                                (x-start 0) (y-start 0)
+                                (x-end nil) (y-end nil))
+                          &body body)
+  `(loop :for ,col-val :from ,x-start :below (if (null ,x-end) (game-map/w ,map) ,x-end)
+         :do
+           (loop :for ,row-val :from ,y-start :below (if (null ,y-end) (game-map/h ,map) ,y-end)
+                 :do
+                    (let ((,tile-val (aref (game-map/tiles ,map) ,col-val ,row-val)))
+                      (declare (ignorable ,tile-val))
+                      ,@body))))
+```
+
+This arcane collection of words and symbols does some interesting magic.  Let's take it apart:
