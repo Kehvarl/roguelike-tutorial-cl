@@ -36,3 +36,23 @@ In our `game-map.lisp` file let's create a macro to handle iterating over tiles 
 ```
 
 This arcane collection of words and symbols does some interesting magic.  Let's take it apart:
+* `(defmaco map-tiles-loop ` Cerate a new macro named `map-tiles-loop`
+  * `(map tile-val` Our macro expects a map and the variable name to use for tiles as we reference them
+  * `&key` We also have some other arguments we pass in as keywords
+    * `(row-val (gensym))` The variable name to use for the row iteration.  If empty, we'll use `gensym` to create a unique name
+    * `(col-val (gensym))` The variable name to use for column iteration.
+    * `(x-start 0) (y-start 0)` Our starting X and Y values, allowing us to address any arbitrary rectangular region in our map.  By default 0,0
+    * `(x-end nil) (y-end nil))` The end x and y values.  By default `nil` which will prompt us to use the entire map size
+  * `&body body` Capture the body that is passed to our macro and stor it in the variable `body` for later reference
+
+* `\`(loop :for ,col-val :from ,x-start :below (if (null ,x-end) (game-map/w ,map) ,x-end)`  Here we use the `loop` construct instead of `dotimes`.  The very first character is a back-quote: "\`" which quotes the expression, but allows un-quoting when we want to reference a variable
+  * `:for ,col-val` Our loop will use the `:for` method to iterate from a starting value to an ending value and keep our count in a provided variable.  In this case we "unquote" `col-val` using the comma operator.  This lets our macro use the value stored in `col-val` as the variable name for the iterator.
+  * `:from ,x-start` Start our For loop at our `x-start` value  (0 by default)
+  * `below (if (null ,x-end) (game-map/w ,map) ,x-end)`  If we have no `x-end` value, then count up to the map width.  Otherwise count up to the value provided.
+  * `:do` The body of our loop
+
+* `(loop :for ,row-val :from ,y-start :below (if (null ,y-end) (game-map/h ,map) ,y-end)` We're still inside our back-quoted form, so we just create a second loop using the same process as the `x` loop.
+
+* `(let ((,tile-val (aref (game-map/tiles ,map) ,col-val ,row-val)))` Get the current tile at the X and Y position stored in the variables whose names we hid inside `col-val` and `row-val`, then store that tile reference in the variable whose name we hold in `tile-val`
+* `(declare (ignorable ,tile-val))` If we don't ever actually use the variable holding our tile reference we don't want an error, so we tell Lisp that it's fine either way.
+* `,@body))))` Paste in our body here at the innermost level of our loop.  
