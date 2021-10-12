@@ -56,3 +56,39 @@ This arcane collection of words and symbols does some interesting magic.  Let's 
 * `(let ((,tile-val (aref (game-map/tiles ,map) ,col-val ,row-val)))` Get the current tile at the X and Y position stored in the variables whose names we hid inside `col-val` and `row-val`, then store that tile reference in the variable whose name we hold in `tile-val`
 * `(declare (ignorable ,tile-val))` If we don't ever actually use the variable holding our tile reference we don't want an error, so we tell Lisp that it's fine either way.
 * `,@body))))` Paste in our body here at the innermost level of our loop.  
+
+### Using our ~~Spell~~ Macro
+Now we'll use our nice new macro to cleanup our `initialize-tiles` and get rid of the nested `dotimes`.
+```lisp
+(defmethod initialize-tiles ((map game-map))
+  (map-tiles-loop (map tile :col-val x :row-val y)
+    (setf (aref (game-map/tiles map) x y) (make-instance 'tile :blocked t))))
+```
+Other than our new macro, there's very little to see here:
+* `(map-tiles-loop (map tile :col-val x :row-val y)` Call `map-tiles-loop`
+  * `map` Pass in the game-map so we'll have something to work on
+  * `tile` Tell the macro that we'll be using the name `tile` to refer to each tile in the map
+  * `:col-val x` Tell the macro we'll use the variable `x` to refer to the x-position in our loop
+  * `:row-val y` Tell the macro we'll use the variable `y` to refer to the y-position in our loop
+* `(setf (aref (game-map/tiles map) x y) (make-instance 'tile :blocked t))))`  The body function to use inside our macro.  Basically, what we want to do inside our nested loops.
+
+We will use this a lot more later, but for now we'll just make the one change.
+
+## Defining Rooms and Tunnels
+Now that our map is a solid, impassible mass; let us carve out some places to be.  First we're going to define a helper class that just holds the description of a room:  A rectangular region of our map that does not overlap with another rectangular region.
+
+```lisp
+(defclass rect ()
+  ((x1 :initarg :x1 :accessor rect/x1)
+   (x2 :initarg :x2 :accessor rect/x2)
+   (y1 :initarg :y1 :accessor rect/y1)
+   (y2 :initarg :y2 :accessor rect/y2)))
+
+(defmethod initialize-instance :after ((rect rect) &key x y w h)
+  (with-slots (x1 x2 y1 y2) rect
+    (setf x1 x
+          y1 y
+          x2 (+ x w)
+          y2 (+ y h))))
+```
+Once again there's nothing actually new being defined:  We create a class that lets us tract the corners of a rectangular region of our map, and we created an `initialize-instance` method that sets those corners, given a starting point along with a known width and height.

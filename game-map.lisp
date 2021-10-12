@@ -38,16 +38,21 @@
                                                (game-map/h map)))))
 
 (defmethod initialize-tiles ((map game-map))
-  (dotimes (y (game-map/h map))
-    (dotimes (x (game-map/w map))
-       (setf (aref (game-map/tiles map) x y) (make-instance 'tile :blocked t))))
-
-  (setf (tile/blocked (aref (game-map/tiles map) 30 22)) t)
-  (setf (tile/block-sight (aref (game-map/tiles map) 30 22)) t)
-  (setf (tile/blocked (aref (game-map/tiles map) 31 22)) t)
-  (setf (tile/block-sight (aref (game-map/tiles map) 31 22)) t)
-  (setf (tile/blocked (aref (game-map/tiles map) 32 22)) t)
-  (setf (tile/block-sight (aref (game-map/tiles map) 32 22)) t))
+  (map-tiles-loop (map tile :col-val x :row-val y)
+    (setf (aref (game-map/tiles map) x y) (make-instance 'tile :blocked t))))
 
 (defmethod blocked-p ((map game-map) x y)
   (tile/blocked (aref (game-map/tiles map) x y)))
+
+(defclass rect ()
+  ((x1 :initarg :x1 :accessor rect/x1)
+   (x2 :initarg :x2 :accessor rect/x2)
+   (y1 :initarg :y1 :accessor rect/y1)
+   (y2 :initarg :y2 :accessor rect/y2)))
+
+(defmethod initialize-instance :after ((rect rect) &key x y w h)
+  (with-slots (x1 x2 y1 y2) rect
+    (setf x1 x
+          y1 y
+          x2 (+ x w)
+          y2 (+ y h))))
