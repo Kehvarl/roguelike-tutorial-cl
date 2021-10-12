@@ -38,16 +38,8 @@
                                                (game-map/h map)))))
 
 (defmethod initialize-tiles ((map game-map))
-  (dotimes (y (game-map/h map))
-    (dotimes (x (game-map/w map))
-       (setf (aref (game-map/tiles map) x y) (make-instance 'tile :blocked t))))
-
-  (setf (tile/blocked (aref (game-map/tiles map) 30 22)) t)
-  (setf (tile/block-sight (aref (game-map/tiles map) 30 22)) t)
-  (setf (tile/blocked (aref (game-map/tiles map) 31 22)) t)
-  (setf (tile/block-sight (aref (game-map/tiles map) 31 22)) t)
-  (setf (tile/blocked (aref (game-map/tiles map) 32 22)) t)
-  (setf (tile/block-sight (aref (game-map/tiles map) 32 22)) t))
+  (map-tiles-loop (map tile :col-val x :row-val y)
+    (setf (aref (game-map/tiles map) x y) (make-instance 'tile :blocked t))))
 
 (defmethod blocked-p ((map game-map) x y)
   (tile/blocked (aref (game-map/tiles map) x y)))

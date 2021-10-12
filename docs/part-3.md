@@ -56,3 +56,18 @@ This arcane collection of words and symbols does some interesting magic.  Let's 
 * `(let ((,tile-val (aref (game-map/tiles ,map) ,col-val ,row-val)))` Get the current tile at the X and Y position stored in the variables whose names we hid inside `col-val` and `row-val`, then store that tile reference in the variable whose name we hold in `tile-val`
 * `(declare (ignorable ,tile-val))` If we don't ever actually use the variable holding our tile reference we don't want an error, so we tell Lisp that it's fine either way.
 * `,@body))))` Paste in our body here at the innermost level of our loop.  
+
+### Using our ~~Spell~~ Macro
+Now we'll use our nice new macro to cleanup our `initialize-tiles` and get rid of the nested `dotimes`.
+```lisp
+(defmethod initialize-tiles ((map game-map))
+  (map-tiles-loop (map tile :col-val x :row-val y)
+    (setf (aref (game-map/tiles map) x y) (make-instance 'tile :blocked t))))
+```
+Other than our new macro, there's very little to see here:
+* `(map-tiles-loop (map tile :col-val x :row-val y)` Call `map-tiles-loop`
+  * `map` Pass in the game-map so we'll have something to work on
+  * `tile` Tell the macro that we'll be using the name `tile` to refer to each tile in the map
+  * `:col-val x` Tell the macro we'll use the variable `x` to refer to the x-position in our loop
+  * `:row-val y` Tell the macro we'll use the variable `y` to refer to the y-position in our loop
+* `(setf (aref (game-map/tiles map) x y) (make-instance 'tile :blocked t))))`  The body function to use inside our macro.  Basically, what we want to do inside our nested loops.
