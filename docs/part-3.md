@@ -71,3 +71,24 @@ Other than our new macro, there's very little to see here:
   * `:col-val x` Tell the macro we'll use the variable `x` to refer to the x-position in our loop
   * `:row-val y` Tell the macro we'll use the variable `y` to refer to the y-position in our loop
 * `(setf (aref (game-map/tiles map) x y) (make-instance 'tile :blocked t))))`  The body function to use inside our macro.  Basically, what we want to do inside our nested loops.
+
+We will use this a lot more later, but for now we'll just make the one change.
+
+## Defining Rooms and Tunnels
+Now that our map is a solid, impassible mass; let us carve out some places to be.  First we're going to define a helper class that just holds the description of a room:  A rectangular region of our map that does not overlap with another rectangular region.
+
+```lisp
+(defclass rect ()
+  ((x1 :initarg :x1 :accessor rect/x1)
+   (x2 :initarg :x2 :accessor rect/x2)
+   (y1 :initarg :y1 :accessor rect/y1)
+   (y2 :initarg :y2 :accessor rect/y2)))
+
+(defmethod initialize-instance :after ((rect rect) &key x y w h)
+  (with-slots (x1 x2 y1 y2) rect
+    (setf x1 x
+          y1 y
+          x2 (+ x w)
+          y2 (+ y h))))
+```
+Once again there's nothing actually new being defined:  We create a class that lets us tract the corners of a rectangular region of our map, and we created an `initialize-instance` method that sets those corners, given a starting point along with a known width and height.

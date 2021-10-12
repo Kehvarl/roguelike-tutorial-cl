@@ -43,3 +43,16 @@
 
 (defmethod blocked-p ((map game-map) x y)
   (tile/blocked (aref (game-map/tiles map) x y)))
+
+(defclass rect ()
+  ((x1 :initarg :x1 :accessor rect/x1)
+   (x2 :initarg :x2 :accessor rect/x2)
+   (y1 :initarg :y1 :accessor rect/y1)
+   (y2 :initarg :y2 :accessor rect/y2)))
+
+(defmethod initialize-instance :after ((rect rect) &key x y w h)
+  (with-slots (x1 x2 y1 y2) rect
+    (setf x1 x
+          y1 y
+          x2 (+ x w)
+          y2 (+ y h))))
