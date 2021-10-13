@@ -138,3 +138,6 @@ And now to use our map, we need to make a change in our `main` function
 Compile and load our changes, and we now how a pair of rooms on our map!
 
 ![Miners need not apply](../screenshots/part-3-2-rooms.gif?raw=true "Making maps the hard way")
+
+### Some cleanup and improvements
+Our `main` function is running the risk of getting unmanageably large, and we're relying on a lot of the loop's special syntax.  Before we move on, we'll take a few moments to clean up our code and make continued work easier.
