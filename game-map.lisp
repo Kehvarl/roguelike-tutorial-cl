@@ -15,7 +15,7 @@
         (setf block-sight blocked))))
 
 (defmethod set-tile-slots ((tile tile) &key (blocked nil blocked-supplied-p) (block-sight nil block-sight-supplied-p))
-  (if block-supplied-p
+  (if blocked-supplied-p
       (setf (slot-value tile 'blocked) blocked))
   (if block-sight-supplied-p
       (setf (slot-value tile 'block-sight) block-sight)))
@@ -49,6 +49,12 @@
 
 (defmethod blocked-p ((map game-map) x y)
   (tile/blocked (aref (game-map/tiles map) x y)))
+
+(defmethod create-room ((map game-map) (room rect))
+  (map-tiles-loop (map tile
+                       :x-start (1+ (rect/x1 room)) :x-end (rect/x2 room)
+                       :y-start (1+ (rect/y1 room)) :y-end (rect/y2 room))
+    (set-tile-slots tile :blocked nil :block-sight nil)))
 
 (defclass rect ()
   ((x1 :initarg :x1 :accessor rect/x1)
