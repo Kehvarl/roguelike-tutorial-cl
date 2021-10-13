@@ -92,3 +92,28 @@ Now that our map is a solid, impassible mass; let us carve out some places to be
           y2 (+ y h))))
 ```
 Once again there's nothing actually new being defined:  We create a class that lets us tract the corners of a rectangular region of our map, and we created an `initialize-instance` method that sets those corners, given a starting point along with a known width and height.
+
+We'll also add some methods that will help us carve those rooms into our map.
+First on the `tile` class:
+```lisp
+(defmethod set-tile-slots ((tile tile) &key (blocked nil blocked-supplied-p) (block-sight nil block-sight-supplied-p))
+  (if blocked-supplied-p
+      (setf (slot-value tile 'blocked) blocked))
+  (if block-sight-supplied-p
+      (setf (slot-value tile 'block-sight) block-sight)))
+```
+Here we introduce a special feature of keyword arguments:
+* `(blocked nil blocked-supplied-p)`
+  * `blocked` - The keyword argument.  Is set by using `:blocked value` when calling our method, and holds the given value.
+  * `nil` - Our default value if we don't use the keyword argument.
+  * `block-supplied-p` a predicate value that is set to `t` if we passed in a value, and `nil` if we're using the default value.   This is a way to tell the difference between a default `nil` and an intentional `nil`
+
+Our second method is on `game-map`:
+```lisp
+(defmethod create-room ((map game-map) (room rect))
+  (map-tiles-loop (map tile
+                       :x-start (1+ (rect/x1 room)) :x-end (rect/x2 room)
+                       :y-start (1+ (rect/y1 room)) :y-end (rect/y2 room))
+    (set-tile-slots tile :blocked nil :block-sight nil)))
+```
+Nothing really new here.  We're using our magic macro to loop through just the tiles we're interested in and setting some values on them.
