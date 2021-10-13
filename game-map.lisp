@@ -33,6 +33,19 @@
                       (declare (ignorable ,tile-val))
                       ,@body))))
 
+(defclass rect ()
+  ((x1 :initarg :x1 :accessor rect/x1)
+   (x2 :initarg :x2 :accessor rect/x2)
+   (y1 :initarg :y1 :accessor rect/y1)
+   (y2 :initarg :y2 :accessor rect/y2)))
+
+(defmethod initialize-instance :after ((rect rect) &key x y w h)
+  (with-slots (x1 x2 y1 y2) rect
+    (setf x1 x
+          y1 y
+          x2 (+ x w)
+          y2 (+ y h))))
+
 (defclass game-map ()
   ((width :initarg :w :accessor game-map/w)
    (height :initarg :h :accessor game-map/h)
@@ -56,15 +69,9 @@
                        :y-start (1+ (rect/y1 room)) :y-end (rect/y2 room))
     (set-tile-slots tile :blocked nil :block-sight nil)))
 
-(defclass rect ()
-  ((x1 :initarg :x1 :accessor rect/x1)
-   (x2 :initarg :x2 :accessor rect/x2)
-   (y1 :initarg :y1 :accessor rect/y1)
-   (y2 :initarg :y2 :accessor rect/y2)))
 
-(defmethod initialize-instance :after ((rect rect) &key x y w h)
-  (with-slots (x1 x2 y1 y2) rect
-    (setf x1 x
-          y1 y
-          x2 (+ x w)
-          y2 (+ y h))))
+(defmethod make-map ((map game-map))
+  (let ((room-1 (make-instance 'rect :x 20 :y 15 :w 10 :h 15))
+        (room-2 (make-instance 'rect :x 35 :y 15 :w 10 :h 15)))
+    (create-room map room-1)
+    (create-room map room-2)))
