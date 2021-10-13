@@ -14,6 +14,12 @@
     (if (null block-sight)
         (setf block-sight blocked))))
 
+(defmethod set-tile-slots ((tile tile) &key (blocked nil blocked-supplied-p) (block-sight nil block-sight-supplied-p))
+  (if block-supplied-p
+      (setf (slot-value tile 'blocked) blocked))
+  (if block-sight-supplied-p
+      (setf (slot-value tile 'block-sight) block-sight)))
+
 (defmacro map-tiles-loop ((map tile-val
                            &key (row-val (gensym)) (col-val (gensym))
                                 (x-start 0) (y-start 0)

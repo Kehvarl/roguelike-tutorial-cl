@@ -92,3 +92,18 @@ Now that our map is a solid, impassible mass; let us carve out some places to be
           y2 (+ y h))))
 ```
 Once again there's nothing actually new being defined:  We create a class that lets us tract the corners of a rectangular region of our map, and we created an `initialize-instance` method that sets those corners, given a starting point along with a known width and height.
+
+We'll also add some methods that will help us carve those rooms into our map.
+First on the `tile` class:
+```lisp
+(defmethod set-tile-slots ((tile tile) &key (blocked nil blocked-supplied-p) (block-sight nil block-sight-supplied-p))
+  (if block-supplied-p
+      (setf (slot-value tile 'blocked) blocked))
+  (if block-sight-supplied-p
+      (setf (slot-value tile 'block-sight) block-sight)))
+```
+Here we introduce a special feature of keyword arguments:
+* `(blocked nil blocked-supplied-p)`
+  * `blocked` - The keyword argument.  Is set by using `:blocked value` when calling our method, and holds the given value.
+  * `nil` - Our default value if we don't use the keyword argument.
+  * `block-supplied-p` a predicate value that is set to `t` if we passed in a value, and `nil` if we're using the default value.   This is a way to tell the difference between a default `nil` and an intentional `nil`
