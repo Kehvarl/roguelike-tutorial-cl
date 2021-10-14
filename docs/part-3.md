@@ -116,4 +116,28 @@ Our second method is on `game-map`:
                        :y-start (1+ (rect/y1 room)) :y-end (rect/y2 room))
     (set-tile-slots tile :blocked nil :block-sight nil)))
 ```
-Nothing really new here.  We're using our magic macro to loop through just the tiles we're interested in and setting some values on them.
+Nothing really new here.  We're using our magic macro to loop through just the tiles we're interested in and setting some values on them. There is one consideration to bear in mind:
+* `:x-start (1+ (rect/x1 room)) :x-end (rect/x2 room)`  As you can see, we're adding 1 to the starting cell, and if you go review our macro, the loop counts up to the target number, but doesn't include it. In this way we end up with a 1-cell border around our room.
+
+Now let's create a couple of test rooms:
+```lisp
+(defmethod make-map ((map game-map))
+  (let ((room-1 (make-instance 'rect :x 20 :y 15 :w 10 :h 15))
+        (room-2 (make-instance 'rect :x 35 :y 15 :w 10 :h 15)))
+    (create-room map room-1)
+    (create-room map room-2)))
+```
+Since our two rooms don't need to actually reference each other we can use `let` for our local variable binding instead of `let*`.
+
+And now to use our map, we need to make a change in our `main` function
+```lisp
+(setf *map* (make-instance 'game-map :w *map-width* :h *map-height*))
+(initialize-tiles *map*)
+(make-map *map*)
+```
+Compile and load our changes, and we now how a pair of rooms on our map!
+
+![Miners need not apply](../screenshots/part-3-2-rooms.gif?raw=true "Making maps the hard way")
+
+### Some cleanup and improvements
+Our `main` function is running the risk of getting unmanageably large, and we're relying on a lot of the loop's special syntax.  Before we move on, we'll take a few moments to clean up our code and make continued work easier.
