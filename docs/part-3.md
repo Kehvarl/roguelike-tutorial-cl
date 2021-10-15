@@ -192,3 +192,36 @@ The new `main` is much streamlined:  We're using `let*` to define some local var
       * `exit` starts out as `nil`
       * Each cycle through the loop, set `exit` to the outcome of calling `game-tick`.
   * (exit) - The "endlist", a list of conditions and values at the end of the loop.  The very first value in this list is the "end-test-form", when it is `T`, the loop ends.
+
+Next, we'll update our `game-map`'s `initialize-instance` to set up the tiles for us.  We could just make that function call `initialize-tiles` like so:
+```lisp
+(defmethod initialize-instance :after ((map game-map) &rest initargs)
+  (declare (ignore initargs))
+  (setf (game-map/tiles map) (make-array (list (game-map/w map)
+                                               (game-map/h map))))
+  (initialize-tiles map))
+```
+However, as `initialze-tiles` is a relatively small function, we'll just inline it into our function like so:
+```lisp
+(defmethod initialize-instance :after ((map game-map) &rest initargs)
+  (declare (ignore initargs))
+  (setf (game-map/tiles map) (make-array (list (game-map/w map)
+                                               (game-map/h map))))
+  (map-tiles-loop (map tile :col-val x :row-val y)
+    (setf (aref (game-map/tiles map) x y) (make-instance 'tile :blocked t))))
+```
+
+And just to make it a little more flexible, we'll make the initial tile state an argument:
+```lisp
+(defmethod initialize-instance :after ((map game-map)
+                                       &rest initargs
+                                       &key (initial-blocked-value t))
+
+  (declare (ignore initargs))
+  (setf (game-map/tiles map) (make-array (list (game-map/w map)
+                                               (game-map/h map))))
+  (map-tiles-loop (map tile :col-val x :row-val y)
+    (setf (aref (game-map/tiles map) x y)
+          (make-instance 'tile :blocked initial-blocked-value))))
+```
+Now we automatically initialize the tiles when we create the map.  By default they're initialized as blocking tiles, but we can just pass in the keyword `:initial-blocked-value` to force them to start in either state.
