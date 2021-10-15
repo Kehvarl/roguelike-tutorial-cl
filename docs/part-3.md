@@ -225,3 +225,6 @@ And just to make it a little more flexible, we'll make the initial tile state an
           (make-instance 'tile :blocked initial-blocked-value))))
 ```
 Now we automatically initialize the tiles when we create the map.  By default they're initialized as blocking tiles, but we can just pass in the keyword `:initial-blocked-value` to force them to start in either state.
+
+### Corridors
+Unless our rooms end up overlapping, we currently have no way to move from room to room.  We will implement some functions to carve corridors that will link rooms for us:
