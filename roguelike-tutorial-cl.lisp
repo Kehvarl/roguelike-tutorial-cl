@@ -88,7 +88,6 @@
                                 :color (blt:yellow)))
            (entities (list player npc))
            (map (make-instance 'game-map :w *map-width* :h *map-height*)))
-      (initialize-tiles map)
       (make-map map)
       (do ((exit nil (game-tick player entities map)))
           (exit)))))

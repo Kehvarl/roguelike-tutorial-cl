@@ -51,14 +51,16 @@
    (height :initarg :h :accessor game-map/h)
    (tile :accessor game-map/tiles)))
 
-(defmethod initialize-instance :after ((map game-map) &rest initargs)
+(defmethod initialize-instance :after ((map game-map)
+                                       &rest initargs
+                                       &key (initial-blocked-value t))
+
   (declare (ignore initargs))
   (setf (game-map/tiles map) (make-array (list (game-map/w map)
-                                               (game-map/h map)))))
-
-(defmethod initialize-tiles ((map game-map))
+                                               (game-map/h map))))
   (map-tiles-loop (map tile :col-val x :row-val y)
-    (setf (aref (game-map/tiles map) x y) (make-instance 'tile :blocked t))))
+    (setf (aref (game-map/tiles map) x y)
+          (make-instance 'tile :blocked initial-blocked-value))))
 
 (defmethod blocked-p ((map game-map) x y)
   (tile/blocked (aref (game-map/tiles map) x y)))
