@@ -50,39 +50,45 @@
                   (:close (setf action (list :quit t))))
     action))
 
+;;The game-tick handles each turn:
+;; Render the map
+;; Check for any player inputs
+;; Perform any needed actions
+;; Return to our main loop.  Pass along the current value of `exit`
+(defun game-tick (player entities map)
+  (render-all entities map)
+  (let* ((action (handle-keys))
+         (move (getf action :move))
+         (exit (getf action :quit)))
+
+    (when move
+      (unless (blocked-p *map*
+                         (+ (entity/x player) (car move))
+                         (+ (entity/y player) (cdr move)))
+        (move player (car move) (cdr move))))
+
+    exit))
+
 ;; Create a terminal window using the settings in our `config` function.
-;; Then enter a loop where we draw the screen and check for a keypress
-;; If the user closes the window or presses Escape, we exit.
+;; Then enter a loop where we let our game-tick perform its duties.
+;; If an exit codition comes back from our tick, quit the program.
 ;; Otherwise loop forever
 (defun main()
   (blt:with-terminal
     (config)
-    (setf *map* (make-instance 'game-map :w *map-width* :h *map-height*))
-    (initialize-tiles *map*)
-    (make-map *map*) 
-    (loop
-      :with player = (make-instance 'entity
-                                    :x (/ *screen-width* 2)
-                                    :y (/ *screen-height* 2)
-                                    :char #\@
-                                    :color (blt:white))
-      :and  npc = (make-instance 'entity
-                                 :x (- (/ *screen-width* 2) 5)
-                                 :y (/ *screen-height* 2)
-                                 :char #\@
-                                 :color (blt:yellow))
-      :with entities = (list player npc)
-      :do
-        (render-all entities *map*)
-        (let* ((action (handle-keys))
-               (move (getf action :move))
-               (exit (getf action :quit)))
-
-          (if exit
-            (return))
-
-          (when move
-            (unless (blocked-p *map*
-                               (+ (entity/x player) (car move))
-                               (+ (entity/y player) (cdr move)))
-              (move player (car move) (cdr move))))))))
+    (let* (( player (make-instance 'entity
+                            :x (/ *screen-width* 2)
+                            :y (/ *screen-height* 2)
+                            :char #\@
+                            :color (blt:white)))
+           (npc  (make-instance 'entity
+                                :x (- (/ *screen-width* 2) 5)
+                                :y (/ *screen-height* 2)
+                                :char #\@
+                                :color (blt:yellow)))
+           (entities (list player npc))
+           (map (make-instance 'game-map :w *map-width* :h *map-height*)))
+      (initialize-tiles map)
+      (make-map map)
+      (do ((exit nil (game-tick player entities map)))
+          (exit)))))
