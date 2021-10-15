@@ -141,3 +141,54 @@ Compile and load our changes, and we now how a pair of rooms on our map!
 
 ### Some cleanup and improvements
 Our `main` function is running the risk of getting unmanageably large, and we're relying on a lot of the loop's special syntax.  Before we move on, we'll take a few moments to clean up our code and make continued work easier.
+
+First up we'll move the innards of our loop to a new function named `game-tick`:
+```lisp
+(defun game-tick (player entities map)
+  (render-all entities map)
+  (let* ((action (handle-keys))
+         (move (getf action :move))
+         (exit (getf action :quit)))
+
+    (when move
+      (unless (blocked-p *map*
+                         (+ (entity/x player) (car move))
+                         (+ (entity/y player) (cdr move)))
+        (move player (car move) (cdr move))))
+
+    exit))
+```
+
+Now that we have a function to handle each frame of our world's existence, we modify `main` to use that.  We'll also lose our complicated `loop` since it's not easy to maintain:
+```lisp
+(defun main()
+  (blt:with-terminal
+    (config)
+    (let* (( player (make-instance 'entity
+                            :x (/ *screen-width* 2)
+                            :y (/ *screen-height* 2)
+                            :char #\@
+                            :color (blt:white)))
+           (npc  (make-instance 'entity
+                                :x (- (/ *screen-width* 2) 5)
+                                :y (/ *screen-height* 2)
+                                :char #\@
+                                :color (blt:yellow)))
+           (entities (list player npc))
+           (map (make-instance 'game-map :w *map-width* :h *map-height*)))
+      (initialize-tiles map)
+      (make-map map)
+      (do ((exit nil (game-tick player entities map)))
+          (exit)))))
+```
+
+The new `main` is much streamlined:  We're using `let*` to define some local variables, and then inside that we're using `do` to run the actual game
+
+* `(do ((exit nil (game-tick player entities map))) (exit))`
+  * `do` Perform a loop until some exit condition happens
+  * `((exit nil (game-tick player entities map)))` - the "varlist" holding all the variables the loop will work with.
+    * `exit nil (game-tick player entities map)`
+      * Define a variable named `exit`
+      * `exit` starts out as `nil`
+      * Each cycle through the loop, set `exit` to the outcome of calling `game-tick`.
+  * (exit) - The "endlist", a list of conditions and values at the end of the loop.  The very first value in this list is the "end-test-form", when it is `T`, the loop ends.
