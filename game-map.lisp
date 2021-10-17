@@ -91,4 +91,5 @@
   (let ((room-1 (make-instance 'rect :x 20 :y 15 :w 10 :h 15))
         (room-2 (make-instance 'rect :x 35 :y 15 :w 10 :h 15)))
     (create-room map room-1)
-    (create-room map room-2)))
+    (create-room map room-2))
+  (create-h-tunnel map 25 40 23))
