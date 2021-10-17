@@ -151,7 +151,7 @@ First up we'll move the innards of our loop to a new function named `game-tick`:
          (exit (getf action :quit)))
 
     (when move
-      (unless (blocked-p *map*
+      (unless (blocked-p map
                          (+ (entity/x player) (car move))
                          (+ (entity/y player) (cdr move)))
         (move player (car move) (cdr move))))
@@ -228,3 +228,20 @@ Now we automatically initialize the tiles when we create the map.  By default th
 
 ### Corridors
 Unless our rooms end up overlapping, we currently have no way to move from room to room.  We will implement some functions to carve corridors that will link rooms for us:
+```lisp
+(defmethod create-h-tunnel ((map game-map) x1 x2 y)
+  (let ((start-x (min x1 x2))
+        (end-x (max x1 x2)))
+    (map-tiles-loop (map tile
+                     :x-start start-x :x-end (1+ end-x)
+                     :y-start y :y-end (1+ y))
+      (set-tile-slots tile :blocked nil :block-sight nil))))
+
+(defmethod create-v-tunnel ((map game-map) y1 y2 x)
+  (let ((start-y (min y1 y2))
+        (end-y (max y1 y2)))
+    (map-tiles-loop (map tile
+                     :x-start x :x-end (1+ x)
+                     :y-start start-y :y-end (1+ end-y))
+      (set-tile-slots tile :blocked nil :block-sight nil))))
+```

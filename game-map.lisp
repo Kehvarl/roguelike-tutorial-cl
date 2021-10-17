@@ -71,6 +71,21 @@
                        :y-start (1+ (rect/y1 room)) :y-end (rect/y2 room))
     (set-tile-slots tile :blocked nil :block-sight nil)))
 
+(defmethod create-h-tunnel ((map game-map) x1 x2 y)
+  (let ((start-x (min x1 x2))
+        (end-x (max x1 x2)))
+    (map-tiles-loop (map tile
+                     :x-start start-x :x-end (1+ end-x)
+                     :y-start y :y-end (1+ y))
+      (set-tile-slots tile :blocked nil :block-sight nil))))
+
+(defmethod create-v-tunnel ((map game-map) y1 y2 x)
+  (let ((start-y (min y1 y2))
+        (end-y (max y1 y2)))
+    (map-tiles-loop (map tile
+                     :x-start x :x-end (1+ x)
+                     :y-start start-y :y-end (1+ end-y))
+      (set-tile-slots tile :blocked nil :block-sight nil))))
 
 (defmethod make-map ((map game-map))
   (let ((room-1 (make-instance 'rect :x 20 :y 15 :w 10 :h 15))

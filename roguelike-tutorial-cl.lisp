@@ -62,7 +62,7 @@
          (exit (getf action :quit)))
 
     (when move
-      (unless (blocked-p *map*
+      (unless (blocked-p map
                          (+ (entity/x player) (car move))
                          (+ (entity/y player) (cdr move)))
         (move player (car move) (cdr move))))
