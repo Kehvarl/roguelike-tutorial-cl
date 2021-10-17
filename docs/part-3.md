@@ -245,3 +245,17 @@ Unless our rooms end up overlapping, we currently have no way to move from room 
                      :y-start start-y :y-end (1+ end-y))
       (set-tile-slots tile :blocked nil :block-sight nil))))
 ```
+
+Using these methods we can add tunnels to connect our rooms. Let's test it in our `make-map` method
+```lisp
+(defmethod make-map ((map game-map))
+  (let ((room-1 (make-instance 'rect :x 20 :y 15 :w 10 :h 15))
+        (room-2 (make-instance 'rect :x 35 :y 15 :w 10 :h 15)))
+    (create-room map room-1)
+    (create-room map room-2))
+  (create-h-tunnel map 25 40 23))
+```
+
+After we compile all our changes and run our game, we can now move between our two rooms!
+
+![Corridors](../screenshots/part-3-4-exploring.gif?raw=true "Giving us more to explore")
