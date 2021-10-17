@@ -1,7 +1,10 @@
 (in-package #:roguelike-tutorial-cl)
 
 (defclass tile ()
-  ((blocked :initarg :blocked
+  ((room-index :initarg :room-index
+               :accessor tile/room-index
+               :initform nil)
+   (blocked :initarg :blocked
             :accessor tile/blocked
             :initform nil)
    (block-sight :initarg :block-sight
@@ -14,11 +17,15 @@
     (if (null block-sight)
         (setf block-sight blocked))))
 
-(defmethod set-tile-slots ((tile tile) &key (blocked nil blocked-supplied-p) (block-sight nil block-sight-supplied-p))
+(defmethod set-tile-slots ((tile tile) &key (blocked nil blocked-supplied-p)
+                                            (block-sight nil block-sight-supplied-p)
+                                            (room-index nil room-index-supplied-p))
   (if blocked-supplied-p
       (setf (slot-value tile 'blocked) blocked))
   (if block-sight-supplied-p
-      (setf (slot-value tile 'block-sight) block-sight)))
+      (setf (slot-value tile 'block-sight) block-sight))
+  (if room-index-supplied-p
+      (setf (slot-value tile 'room-index) room-index)))
 
 (defmacro map-tiles-loop ((map tile-val
                            &key (row-val (gensym)) (col-val (gensym))
@@ -65,11 +72,12 @@
 (defmethod blocked-p ((map game-map) x y)
   (tile/blocked (aref (game-map/tiles map) x y)))
 
-(defmethod create-room ((map game-map) (room rect))
+(defgeneric create-room (map rect room-index))
+(defmethod create-room ((map game-map) (room rect) room-index)
   (map-tiles-loop (map tile
                        :x-start (1+ (rect/x1 room)) :x-end (rect/x2 room)
                        :y-start (1+ (rect/y1 room)) :y-end (rect/y2 room))
-    (set-tile-slots tile :blocked nil :block-sight nil)))
+    (set-tile-slots tile :blocked nil :block-sight nil :room-index room-index)))
 
 (defmethod create-h-tunnel ((map game-map) x1 x2 y)
   (let ((start-x (min x1 x2))

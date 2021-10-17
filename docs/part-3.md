@@ -259,3 +259,50 @@ Using these methods we can add tunnels to connect our rooms. Let's test it in ou
 After we compile all our changes and run our game, we can now move between our two rooms!
 
 ![Corridors](../screenshots/part-3-4-exploring.gif?raw=true "Giving us more to explore")
+
+### Keeping Track
+Now we can carve rooms and corridors into our map.  There are several ways we can keep track of what tiles make up a given room, but one of the most flexible will be to have the tile itself hold an identifier telling us what room it's part of.
+
+To that end, we'll jump into our `game-map.lisp` file and make some adjustments
+First to our `tile` definition, we add a `room-index`
+```lisp
+(defclass tile ()
+  ((room-index :initarg :room-index
+               :accessor tile/room-index
+               :initform nil)
+   (blocked :initarg :blocked
+            :accessor tile/blocked
+            :initform nil)
+   (block-sight :initarg :block-sight
+                :accessor tile/block-sight
+                :initform nil)))
+```
+
+And we allow our `set-tile-slots` method to modify the `room-index`
+```lisp
+(defmethod set-tile-slots ((tile tile) &key (blocked nil blocked-supplied-p)
+                                            (block-sight nil block-sight-supplied-p)
+                                            (room-index nil room-index-supplied-p))
+  (if blocked-supplied-p
+      (setf (slot-value tile 'blocked) blocked))
+  (if block-sight-supplied-p
+      (setf (slot-value tile 'block-sight) block-sight))
+  (if room-index-supplied-p
+      (setf (slot-value tile 'room-index) room-index)))
+```
+
+And then a quick change to `create-room` to allow us to give each room it's index, like so:
+```lisp
+(defgeneric create-room (map rect room-index))
+(defmethod create-room ((map game-map) (room rect) room-index)
+  (map-tiles-loop (map tile
+                       :x-start (1+ (rect/x1 room)) :x-end (rect/x2 room)
+                       :y-start (1+ (rect/y1 room)) :y-end (rect/y2 room))
+    (set-tile-slots tile :blocked nil :block-sight nil :room-index room-index)))
+```
+Since we're changing the number of arguments that a method expects, we either need to restart Lisp and reload our project, or we can redefine the generic function that our method implements.
+* `(defgeneric create-room (map rect room-index))` define a generic function that expects 3 parameters.
+
+![Redefining Generic](../screenshots/part-3-5-redefine-generic.png?raw=true "Changing the nature of reality.")
+When we compile this new defgeneric (ALT+c), we'll be prompted with an error message.  Select the option to "Remove all methods", then compile the generic again, and it will succeed.
+Now we can compile our upgraded `create-room` without issue.
