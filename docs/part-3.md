@@ -139,7 +139,7 @@ Compile and load our changes, and we now how a pair of rooms on our map!
 
 ![Miners need not apply](../screenshots/part-3-2-rooms.gif?raw=true "Making maps the hard way")
 
-### Some cleanup and improvements
+## Some cleanup and improvements
 Our `main` function is running the risk of getting unmanageably large, and we're relying on a lot of the loop's special syntax.  Before we move on, we'll take a few moments to clean up our code and make continued work easier.
 
 First up we'll move the innards of our loop to a new function named `game-tick`:
@@ -226,7 +226,7 @@ And just to make it a little more flexible, we'll make the initial tile state an
 ```
 Now we automatically initialize the tiles when we create the map.  By default they're initialized as blocking tiles, but we can just pass in the keyword `:initial-blocked-value` to force them to start in either state.
 
-### Corridors
+## Corridors
 Unless our rooms end up overlapping, we currently have no way to move from room to room.  We will implement some functions to carve corridors that will link rooms for us:
 ```lisp
 (defmethod create-h-tunnel ((map game-map) x1 x2 y)
@@ -306,3 +306,28 @@ Since we're changing the number of arguments that a method expects, we either ne
 ![Redefining Generic](../screenshots/part-3-5-redefine-generic.png?raw=true "Changing the nature of reality.")
 When we compile this new defgeneric (ALT+c), we'll be prompted with an error message.  Select the option to "Remove all methods", then compile the generic again, and it will succeed.
 Now we can compile our upgraded `create-room` without issue.
+
+## Random Generation
+Now that we have the tools to carve out rooms and tunnels, we're nearly ready to create some random dungeons to explore.
+
+We'll start by creating a couple more utility methods, this time on `rect`.  Specifically we want to be able to fine the center of any rect as well as determine if two rects would intersect.
+
+```lisp
+(defmethod center ((rect rect))
+  (with-slots (x1 x2 y1 y2) rect
+    (let ((center-x (round (/ (+ x1 x2) 2)))
+          (center-y (round (/ (+ y1 y2) 2))))
+      (values center-x-center-y))))
+```
+This simple method introduces the `values` function, which lets us return multiple values from a method instead of just one
+
+```lisp
+(defmethod intersect ((rect rect) (other rect))
+  "Returns T if this RECT intersects with OTHER"
+  (and (<= (rect/x1 rect) (rect/x2 other))
+       (>= (rect/x2 rect) (rect/x1 other))
+       (<= (rect/y1 rect) (rect/y2 other))
+       (>= (rect/y2 rect) (rect/y1 other))))
+```
+
+Now we're finally ready to build a simple random dungeon generator.

@@ -53,6 +53,19 @@
           x2 (+ x w)
           y2 (+ y h))))
 
+(defmethod center ((rect rect))
+  (with-slots (x1 x2 y1 y2) rect
+    (let ((center-x (round (/ (+ x1 x2) 2)))
+          (center-y (round (/ (+ y1 y2) 2))))
+      (values center-x-center-y))))
+
+(defmethod intersect ((rect rect) (other rect))
+  "Returns T if this RECT intersects with OTHER"
+  (and (<= (rect/x1 rect) (rect/x2 other))
+       (>= (rect/x2 rect) (rect/x1 other))
+       (<= (rect/y1 rect) (rect/y2 other))
+       (>= (rect/y2 rect) (rect/y1 other))))
+
 (defclass game-map ()
   ((width :initarg :w :accessor game-map/w)
    (height :initarg :h :accessor game-map/h)
