@@ -331,3 +331,13 @@ This simple method introduces the `values` function, which lets us return multip
 ```
 
 Now we're finally ready to build a simple random dungeon generator.
+
+Over in our main file, we'll set up some global parameters:
+First: find and remove `(defparameter *map* nil)` since we no longer need a global map.
+Next add the following
+```lisp
+(defparameter *room-max-size* 10)
+(defparameter *room-min-size* 6)
+(defparameter *max-rooms* 30)
+```
+To set up some basic map parameters.
