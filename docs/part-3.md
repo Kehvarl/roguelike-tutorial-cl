@@ -334,10 +334,31 @@ Now we're finally ready to build a simple random dungeon generator.
 
 Over in our main file, we'll set up some global parameters:
 First: find and remove `(defparameter *map* nil)` since we no longer need a global map.
-Next add the following
+Next add the following map-generation parameters to our main file.
 ```lisp
 (defparameter *room-max-size* 10)
 (defparameter *room-min-size* 6)
 (defparameter *max-rooms* 30)
 ```
-To set up some basic map parameters.
+
+Now we're ready to implement a simple generator.  Over in our `game-map` file, let's update `make-map`:
+```lisp
+(defmethod make-map ((map game-map) max-rooms room-min-size room-max-size map-width map-height player)
+  (do* ((rooms nil)
+        (num-rooms 0)
+        (room-index 0 (1+ room-index))
+        (w (+ (random (- room-max-size room-min-size)) room-min-size)
+           (+ (random (- room-max-size room-min-size)) room-min-size))
+        (h (+ (random (- room-max-size room-min-size)) room-min-size)
+           (+ (random (- room-max-size room-min-size)) room-min-size))
+        (x (random (- map-width w))
+           (random (- map-width w)))
+        (y (random (- map-height h))
+           (random (- map-height h)))
+        (new-room (make-instance 'rect :x x :y y :w w :h h)
+                  (make-instance 'rect :x x :y y :w w : h h))
+        (can-place-p t t))
+       ((>= room-index max-rooms))
+       ()))
+```     
+First we redefine our method to take some extra parameters.  Then we're going to use a `do*` loop to create rooms up to our maximum number.  For each room we'll pick a random position on the map, and some dimensions for the room itself, and store that in a `rect` object.  We're also defining a `can-place` variable which will eventually help us determine legal room placement before we write them to the map.
