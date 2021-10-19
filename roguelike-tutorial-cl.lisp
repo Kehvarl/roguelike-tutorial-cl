@@ -9,7 +9,9 @@
 (defparameter *map-width* 80)
 (defparameter *map-height* 45)
 
-(defparameter *map* nil)
+(defparameter *room-max-size* 10)
+(defparameter *room-min-size* 6)
+(defparameter *max-rooms* 30)
 
 ;; Terminal Window Settings.
 (defun config ()
