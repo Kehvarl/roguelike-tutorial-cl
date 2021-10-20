@@ -124,4 +124,6 @@
                   (make-instance 'rect :x x :y y :w w : h h))
         (can-place-p t t))
        ((>= room-index max-rooms))
-       ()))
+       (dolist (other room rooms)
+          (if (intersect new-room other-room)
+            (setf can-place-p nil)))))
