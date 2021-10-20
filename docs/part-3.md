@@ -362,3 +362,27 @@ Now we're ready to implement a simple generator.  Over in our `game-map` file, l
        ()))
 ```     
 First we redefine our method to take some extra parameters.  Then we're going to use a `do*` loop to create rooms up to our maximum number.  For each room we'll pick a random position on the map, and some dimensions for the room itself, and store that in a `rect` object.  We're also defining a `can-place` variable which will eventually help us determine legal room placement before we write them to the map.
+
+Next we'll expand on our loop:
+```lisp
+(defmethod make-map ((map game-map) max-rooms room-min-size room-max-size map-width map-height player)
+  (do* ((rooms nil)
+        (num-rooms 0)
+        (room-index 0 (1+ room-index))
+        (w (+ (random (- room-max-size room-min-size)) room-min-size)
+           (+ (random (- room-max-size room-min-size)) room-min-size))
+        (h (+ (random (- room-max-size room-min-size)) room-min-size)
+           (+ (random (- room-max-size room-min-size)) room-min-size))
+        (x (random (- map-width w))
+           (random (- map-width w)))
+        (y (random (- map-height h))
+           (random (- map-height h)))
+        (new-room (make-instance 'rect :x x :y y :w w :h h)
+                  (make-instance 'rect :x x :y y :w w : h h))
+        (can-place-p t t))
+       ((>= room-index max-rooms))
+       (dolist (other room rooms)
+          (if (intersect new-room other-room)
+            (setf can-place-p nil)))))
+```
+We'll loop through our list of rooms, and if our new room intersects with any, it's an invalid room            
