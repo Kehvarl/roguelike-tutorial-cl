@@ -385,4 +385,29 @@ Next we'll expand on our loop:
           (if (intersect new-room other-room)
             (setf can-place-p nil)))))
 ```
-We'll loop through our list of rooms, and if our new room intersects with any, it's an invalid room            
+We'll loop through our list of rooms, and if our new room intersects with any, it's an invalid room.  If the room is valid though, let's plot it and draw some tunnels!
+
+```lisp
+(defmethod make-map ((map game-map) max-rooms room-min-size room-max-size map-width map-height player)
+  (do* ;; Existing code...
+       (dolist (other room rooms)
+          (if (intersect new-room other-room)
+            (setf can-place-p nil)))
+       (when can-place-p
+         (create-room map new-room)
+         (multiple-value-bind (new-x new-y) (center new-room)
+           (if (zerop num-rooms)
+               (setf (entity/x player) new-x
+                     (entity/y player) new-y)
+               (multiple-value-bind (prev-x prev-y) (center (car (last rooms)))
+                  (cond ((= (random 2) 1)
+                         (create-h-tunnel map prev-x new-x prev-y)
+                         (create-v-tunnel map prev-y new-y new-x))
+                        (t
+                         (create-v-tunnel map prev-y new-y new-x)
+                         (create-h-tunnel map prev-x new-x prev-y)))))
+           (if (null rooms)
+             (setf rooms (list new-room))
+             (push new-room (cdr (last rooms))))
+           (incf num-rooms)))))
+```
