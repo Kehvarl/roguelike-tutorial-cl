@@ -126,4 +126,21 @@
        ((>= room-index max-rooms))
        (dolist (other room rooms)
           (if (intersect new-room other-room)
-            (setf can-place-p nil)))))
+            (setf can-place-p nil)))
+       (when can-place-p
+         (create-room map new-room)
+         (multiple-value-bind (new-x new-y) (center new-room)
+           (if (zerop num-rooms)
+               (setf (entity/x player) new-x
+                     (entity/y player) new-y)
+               (multiple-value-bind (prev-x prev-y) (center (car (last rooms)))
+                  (cond ((= (random 2) 1)
+                         (create-h-tunnel map prev-x new-x prev-y)
+                         (create-v-tunnel map prev-y new-y new-x))
+                        (t
+                         (create-v-tunnel map prev-y new-y new-x)
+                         (create-h-tunnel map prev-x new-x prev-y)))))
+           (if (null rooms)
+             (setf rooms (list new-room))
+             (push new-room (cdr (last rooms))))
+           (incf num-rooms)))))
