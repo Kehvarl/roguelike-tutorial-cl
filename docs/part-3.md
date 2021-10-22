@@ -388,13 +388,14 @@ Next we'll expand on our loop:
 We'll loop through our list of rooms, and if our new room intersects with any, it's an invalid room.  If the room is valid though, let's plot it and draw some tunnels!
 
 ```lisp
+(defgeneric make-map (map max-rooms room-min-size room-max-size map-width map-height player))
 (defmethod make-map ((map game-map) max-rooms room-min-size room-max-size map-width map-height player)
-  (do* ;; Existing code...
-       (dolist (other room rooms)
+  (do* ;;existing code...
+       (dolist (other-room rooms)
           (if (intersect new-room other-room)
             (setf can-place-p nil)))
        (when can-place-p
-         (create-room map new-room)
+         (create-room map new-room room-index)
          (multiple-value-bind (new-x new-y) (center new-room)
            (if (zerop num-rooms)
                (setf (entity/x player) new-x
@@ -411,3 +412,12 @@ We'll loop through our list of rooms, and if our new room intersects with any, i
              (push new-room (cdr (last rooms))))
            (incf num-rooms)))))
 ```
+
+A quick update to our `main` loop's call to `make-map`:
+```lisp
+(make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player)
+```
+
+And we have a random dungeon!
+
+![aMAZEing](../screenshots/part-3-6-mazes.gif?raw=true "Hope you brought a ball of string.")
