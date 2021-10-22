@@ -57,7 +57,7 @@
   (with-slots (x1 x2 y1 y2) rect
     (let ((center-x (round (/ (+ x1 x2) 2)))
           (center-y (round (/ (+ y1 y2) 2))))
-      (values center-x-center-y))))
+      (values center-x center-y))))
 
 (defmethod intersect ((rect rect) (other rect))
   "Returns T if this RECT intersects with OTHER"
@@ -108,6 +108,7 @@
                      :y-start start-y :y-end (1+ end-y))
       (set-tile-slots tile :blocked nil :block-sight nil))))
 
+(defgeneric make-map (map max-rooms room-min-size room-max-size map-width map-height player))
 (defmethod make-map ((map game-map) max-rooms room-min-size room-max-size map-width map-height player)
   (do* ((rooms nil)
         (num-rooms 0)
@@ -121,14 +122,14 @@
         (y (random (- map-height h))
            (random (- map-height h)))
         (new-room (make-instance 'rect :x x :y y :w w :h h)
-                  (make-instance 'rect :x x :y y :w w : h h))
+                  (make-instance 'rect :x x :y y :w w :h h))
         (can-place-p t t))
        ((>= room-index max-rooms))
-       (dolist (other room rooms)
+       (dolist (other-room rooms)
           (if (intersect new-room other-room)
             (setf can-place-p nil)))
        (when can-place-p
-         (create-room map new-room)
+         (create-room map new-room room-index)
          (multiple-value-bind (new-x new-y) (center new-room)
            (if (zerop num-rooms)
                (setf (entity/x player) new-x
