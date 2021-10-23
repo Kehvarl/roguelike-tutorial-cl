@@ -31,3 +31,21 @@ While FoV uses the game-map, we're not going to put it in the game-map file; bot
   * `(:file "fov") ;; Insert after our game-map reference`
 
 And now we're ready to get to writing code!
+
+### Clearing the FoV
+Before calculating a new Field of View, it's important to clear out the old one so that areas drop out of sight as the player moves away from them:
+```lisp
+(defparameter *fov-distance* 5)
+
+(defun reset-visibility (map)
+  (map-tiles-loop (map tile)
+    (setf (tile/visible tile) nil)))
+
+(defun fov (map x y)
+  (declare (ignorable x y))
+  (reset-visibility map))
+```
+Nothing unusual here:
+* Define a global parameter to hold our visibility range
+* Create a function that uses our magic macro to reset what has been seen
+* Create a new function that will eventually calculate the FoV given an map and the player's position.  Since we're not using that position yet we tell Lisp it can be ignored so that everything compiles cleanly.
