@@ -9,7 +9,10 @@
             :initform nil)
    (block-sight :initarg :block-sight
                 :accessor tile/block-sight
-                :initform nil)))
+                :initform nil)
+   (visible :initarg :visible
+            :accessor tile/visible
+            :initform nil)))
 
 (defmethod initialize-instance :after ((tile tile) &rest initargs)
   (declare (ignore initargs))
