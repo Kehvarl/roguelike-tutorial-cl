@@ -21,3 +21,13 @@ There are several ways to calculate what a player can see, and keep track of the
             :initform nil)))
 ```
 There are no new tricks here, we're just adding one more slot to our `tile` class and making sure it's set to `nil` by default.
+
+### Organization
+While FoV uses the game-map, we're not going to put it in the game-map file; both because that file is getting a little crowded, and because it's not necessarily part of the map.  If anything it's part of the player.
+
+* Create a new file: `fov.lisp` and make sure its functions are included in our project
+  * `(in-package #:roguelike-tutorial-cl) ;; First Line in all our project files`
+* Add our file to our `.asd` so it will be loaded properly
+  * `(:file "fov") ;; Insert after our game-map reference`
+
+And now we're ready to get to writing code!
