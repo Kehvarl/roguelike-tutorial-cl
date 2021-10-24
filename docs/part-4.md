@@ -49,3 +49,23 @@ Nothing unusual here:
 * Define a global parameter to hold our visibility range
 * Create a function that uses our magic macro to reset what has been seen
 * Create a new function that will eventually calculate the FoV given an map and the player's position.  Since we're not using that position yet we tell Lisp it can be ignored so that everything compiles cleanly.
+
+
+Next up we need some functions to handle our math:
+```lisp
+(defun degree-to-radian (degree)
+  (* degree (/ pi 180)))
+
+(defun diagonal-distance (x0 y0 x1 y1)
+  (let ((dx (- x0 x1))
+        (dy (- y0 y1)))
+    (max (abs dx) (abs dy))))
+
+(defun lerp (start end time)
+  (+ start (* time (- end start))))
+```
+
+Here we're implementing some tools that we'll use in our field-of-view calculator:
+* `degree-to-radian` - converts a value in degrees (0 to 360) into the number of radians around the arc of a circle that angle represents.
+* `diagonal-distance` - A quick-and-dirty way to get the distance between 2 points on a grid is to simply find which axis had the most change and that's your distance.
+* `lerp` - [The Linear Interpolation](https://en.wikipedia.org/wiki/Linear%5Finterpolation) function is used to take steps along a line on a grid and determine what cell we're actually in.
