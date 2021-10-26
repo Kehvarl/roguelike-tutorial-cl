@@ -69,3 +69,40 @@ Here we're implementing some tools that we'll use in our field-of-view calculato
 * `degree-to-radian` - converts a value in degrees (0 to 360) into the number of radians around the arc of a circle that angle represents.
 * `diagonal-distance` - A quick-and-dirty way to get the distance between 2 points on a grid is to simply find which axis had the most change and that's your distance.
 * `lerp` - [The Linear Interpolation](https://en.wikipedia.org/wiki/Linear%5Finterpolation) function is used to take steps along a line on a grid and determine what cell we're actually in.
+
+
+Now let's calculate our player's field ov view:
+```Lisp
+(defun fov (map x y)
+  (reset-visibility map)
+
+  (dotimes (degree 360)
+    (let* ((rad (degree-to-radian degree))
+           (nx (round (+ (* (cos rad) *fov-distance*) x)))
+           (ny (round (+ (* (sin rad) *fov-distance*) y)))
+           (d (diagonal-distance x y nx ny)))
+      (dotimes (tile d)
+        (let ((tx (round (lerp x nx (/ tile d))))
+              (ty (round (lerp y ny (/ tile d)))))
+          (if (or (< tx 0) (> tx (game-map/w map)))
+            (return))
+          (if (or (< ty 0) (> ty (game-map/h map)))
+            (return))
+
+          (when (tile/block-sight (aref (game-map/tiles map) tx ty))
+            (setf (tile/visible (aref (game-map/tiles map) tx ty)) t)
+            (return))
+
+          (setf (tile/visible (aref (game-map/tiles map) tx ty)) t))))))
+```
+
+The algorithm itself is relatively simple, especially now that we have some helpers for the math:
+* Reset all visibility
+* For each of 360 degrees
+  * Use some trigonometry to find the x,y coordinate of the tile on the outer edge of the circle representing `degree` degrees around the circle
+  * Get the number of tiles from the player to that calculated position
+  * For each of the count of tiles
+    * Use our Linear Interpolation to determine the tile `tile` cells out along the line from `x,y` to `nx,ny`
+    * If we run into a border of the map, exit our inner loop
+    * If we run into a wall, make it visible, then exit our inner loop
+    * Otherwise mark the tile visible and continue along the line.
