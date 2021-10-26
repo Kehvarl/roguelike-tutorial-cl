@@ -99,7 +99,7 @@ Now let's calculate our player's field ov view:
 The algorithm itself is relatively simple, especially now that we have some helpers for the math:
 * Reset all visibility
 * For each of 360 degrees
-  * Use some trigonometry to find the x,y coordinate of the tile on the outer edge of the circle representing `degree` degrees around the circle
+  * Use some trigonometry to find the `nx,ny` coordinate of the tile on the outer edge of the circle representing `degree` degrees around the circle centered on `x,y`
   * Get the number of tiles from the player to that calculated position
   * For each of the count of tiles
     * Use our Linear Interpolation to determine the tile `tile` cells out along the line from `x,y` to `nx,ny`
