@@ -173,3 +173,5 @@ If you ran the code already, you'll have noticed that there's no FoV drawn until
       (do ((exit nil (game-tick player entities map)))
           (exit)))))
 ```
+
+![Light up your life](../screenshots/part-4-2-fov.gif?raw=true "What a glowing personality you have.")
