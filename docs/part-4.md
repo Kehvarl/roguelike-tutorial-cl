@@ -145,4 +145,31 @@ Next, we modify `render-all` to track the visibility of a tile:
 We've only made a few changes here.
 * `(visible (tile/visible tile))` Check the visibilty of each tile as we iterate
 * `(if visible` Use that visibility state to change how we draw the tiles.
-  
+
+Lastly, but possibly the most important, we tell our `game-tick` to update the FoV every move:
+```lisp
+(defun game-tick (player entities map)
+  (render-all entities map)
+  (let* ((action (handle-keys))
+         (move (getf action :move))
+         (exit (getf action :quit)))
+
+    (when move
+      (unless (blocked-p map
+                         (+ (entity/x player) (car move))
+                         (+ (entity/y player) (cdr move)))
+        (move player (car move) (cdr move))
+        (fov map (entity/x player) (entity/y player))))
+
+    exit))
+```
+
+Extra credit:
+If you ran the code already, you'll have noticed that there's no FoV drawn until the player moves for the first time.   To resolve that, we'll make a change to our `main`:
+```lisp
+(defun main()
+;;; ...Lots of existing code...
+      (fov map (entity/x player) (entity/y player))
+      (do ((exit nil (game-tick player entities map)))
+          (exit)))))
+```

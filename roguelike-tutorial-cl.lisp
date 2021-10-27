@@ -100,5 +100,6 @@
            (entities (list player npc))
            (map (make-instance 'game-map :w *map-width* :h *map-height*)))
       (make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player)
+      (fov map (entity/x player) (entity/y player))
       (do ((exit nil (game-tick player entities map)))
           (exit)))))
