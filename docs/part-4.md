@@ -116,3 +116,33 @@ First, we define a couple of new colors in our color-map:
                                 :light-wall (blt:rgba 130 110 50)
                                 :light-ground (blt:rgba 200 180 50)))
 ```
+
+Next, we modify `render-all` to track the visibility of a tile:
+```lisp
+(defun render-all (entities map)
+  (blt:clear)
+  (dotimes (y (game-map/h map))
+    (dotimes (x (game-map/w map))
+       (let* ((tile (aref (game-map/tiles map) x y))
+              (wall (tile/blocked tile))
+              (visible (tile/visible tile)))
+         (if visible
+           (if wall
+             (setf (blt:background-color) (getf *color-map* :light-wall))
+             (setf (blt:background-color) (getf *color-map* :light-ground)))
+
+           (if wall
+            (setf (blt:background-color) (getf *color-map* :dark-wall))
+            (setf (blt:background-color) (getf *color-map* :dark-ground)))))
+       (setf (blt:cell-char x y) #\Space)))
+
+  (mapc #'draw entities)
+
+  (setf (blt:background-color) (blt:black))
+  (blt:refresh))
+```
+
+We've only made a few changes here.
+* `(visible (tile/visible tile))` Check the visibilty of each tile as we iterate
+* `(if visible` Use that visibility state to change how we draw the tiles.
+  
