@@ -106,3 +106,72 @@ The algorithm itself is relatively simple, especially now that we have some help
     * If we run into a border of the map, exit our inner loop
     * If we run into a wall, make it visible, then exit our inner loop
     * Otherwise mark the tile visible and continue along the line.
+
+### Rendering our Field of view
+Now that we can calculate the FoV, we will adapt the renderer to do something with that new feature.
+First, we define a couple of new colors in our color-map:
+```lisp
+(defparameter *color-map* (list :dark-wall (blt:rgba 0 0 100)
+                                :dark-ground (blt:rgba 50 50 150)
+                                :light-wall (blt:rgba 130 110 50)
+                                :light-ground (blt:rgba 200 180 50)))
+```
+
+Next, we modify `render-all` to track the visibility of a tile:
+```lisp
+(defun render-all (entities map)
+  (blt:clear)
+  (dotimes (y (game-map/h map))
+    (dotimes (x (game-map/w map))
+       (let* ((tile (aref (game-map/tiles map) x y))
+              (wall (tile/blocked tile))
+              (visible (tile/visible tile)))
+         (if visible
+           (if wall
+             (setf (blt:background-color) (getf *color-map* :light-wall))
+             (setf (blt:background-color) (getf *color-map* :light-ground)))
+
+           (if wall
+            (setf (blt:background-color) (getf *color-map* :dark-wall))
+            (setf (blt:background-color) (getf *color-map* :dark-ground)))))
+       (setf (blt:cell-char x y) #\Space)))
+
+  (mapc #'draw entities)
+
+  (setf (blt:background-color) (blt:black))
+  (blt:refresh))
+```
+
+We've only made a few changes here.
+* `(visible (tile/visible tile))` Check the visibilty of each tile as we iterate
+* `(if visible` Use that visibility state to change how we draw the tiles.
+
+Lastly, but possibly the most important, we tell our `game-tick` to update the FoV every move:
+```lisp
+(defun game-tick (player entities map)
+  (render-all entities map)
+  (let* ((action (handle-keys))
+         (move (getf action :move))
+         (exit (getf action :quit)))
+
+    (when move
+      (unless (blocked-p map
+                         (+ (entity/x player) (car move))
+                         (+ (entity/y player) (cdr move)))
+        (move player (car move) (cdr move))
+        (fov map (entity/x player) (entity/y player))))
+
+    exit))
+```
+
+Extra credit:
+If you ran the code already, you'll have noticed that there's no FoV drawn until the player moves for the first time.   To resolve that, we'll make a change to our `main`:
+```lisp
+(defun main()
+;;; ...Lots of existing code...
+      (fov map (entity/x player) (entity/y player))
+      (do ((exit nil (game-tick player entities map)))
+          (exit)))))
+```
+
+![Light up your life](../screenshots/part-4-2-fov.gif?raw=true "What a glowing personality you have.")

@@ -21,7 +21,9 @@
 
 ;; Tile Colors to help distinguish things
 (defparameter *color-map* (list :dark-wall (blt:rgba 0 0 100)
-                                :dark-ground (blt:rgba 50 50 150)))
+                                :dark-ground (blt:rgba 50 50 150)
+                                :light-wall (blt:rgba 130 110 50)
+                                :light-ground (blt:rgba 200 180 50)))
 
 ;; Render (draw) our terminal window
 (defun render-all (entities map)
@@ -29,10 +31,16 @@
   (dotimes (y (game-map/h map))
     (dotimes (x (game-map/w map))
        (let* ((tile (aref (game-map/tiles map) x y))
-              (wall (tile/blocked tile)))
-         (if wall
-           (setf (blt:background-color) (getf *color-map* :dark-wall))
-           (setf (blt:background-color) (getf *color-map* :dark-ground))))
+              (wall (tile/blocked tile))
+              (visible (tile/visible tile)))
+         (if visible
+           (if wall
+             (setf (blt:background-color) (getf *color-map* :light-wall))
+             (setf (blt:background-color) (getf *color-map* :light-ground)))
+
+           (if wall
+            (setf (blt:background-color) (getf *color-map* :dark-wall))
+            (setf (blt:background-color) (getf *color-map* :dark-ground)))))
        (setf (blt:cell-char x y) #\Space)))
 
   (mapc #'draw entities)
@@ -67,7 +75,8 @@
       (unless (blocked-p map
                          (+ (entity/x player) (car move))
                          (+ (entity/y player) (cdr move)))
-        (move player (car move) (cdr move))))
+        (move player (car move) (cdr move))
+        (fov map (entity/x player) (entity/y player))))
 
     exit))
 
@@ -91,5 +100,6 @@
            (entities (list player npc))
            (map (make-instance 'game-map :w *map-width* :h *map-height*)))
       (make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player)
+      (fov map (entity/x player) (entity/y player))
       (do ((exit nil (game-tick player entities map)))
           (exit)))))
