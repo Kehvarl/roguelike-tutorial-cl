@@ -21,7 +21,9 @@
 
 ;; Tile Colors to help distinguish things
 (defparameter *color-map* (list :dark-wall (blt:rgba 0 0 100)
-                                :dark-ground (blt:rgba 50 50 150)))
+                                :dark-ground (blt:rgba 50 50 150)
+                                :light-wall (blt:rgba 130 110 50)
+                                :light-ground (blt:rgba 200 180 50)))
 
 ;; Render (draw) our terminal window
 (defun render-all (entities map)

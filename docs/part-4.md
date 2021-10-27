@@ -106,3 +106,13 @@ The algorithm itself is relatively simple, especially now that we have some help
     * If we run into a border of the map, exit our inner loop
     * If we run into a wall, make it visible, then exit our inner loop
     * Otherwise mark the tile visible and continue along the line.
+
+### Rendering our Field of view
+Now that we can calculate the FoV, we will adapt the renderer to do something with that new feature.
+First, we define a couple of new colors in our color-map:
+```lisp
+(defparameter *color-map* (list :dark-wall (blt:rgba 0 0 100)
+                                :dark-ground (blt:rgba 50 50 150)
+                                :light-wall (blt:rgba 130 110 50)
+                                :light-ground (blt:rgba 200 180 50)))
+```
