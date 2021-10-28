@@ -175,3 +175,9 @@ If you ran the code already, you'll have noticed that there's no FoV drawn until
 ```
 
 ![Light up your life](../screenshots/part-4-2-fov.gif?raw=true "What a glowing personality you have.")
+
+#Exploration
+Now that we can light up the area around our player, let's make a few more changes.  Our players can still see the entire map right from the start, and monsters are still visible even if they're not in our Field of View.
+
+## Fog of War
+To fix the map visibility issue, let's implement some Fog of War!   Areas that haven't been explored will not be drawn at all, and areas we have explored, but which are outside of our field of view won't show if there are monsters or other things there.
