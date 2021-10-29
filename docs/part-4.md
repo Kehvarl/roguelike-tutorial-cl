@@ -213,5 +213,32 @@ Now that we can track the explored state, we need to make sure we maintain it.  
 
 And finally, we need to draw the explored parts of the map while hiding those unexplored and mysterious regions.   To the `render-all` function!
 ```lisp
+(defun render-all (entities map)
+  (blt:clear)
+  (dotimes (y (game-map/h map))
+    (dotimes (x (game-map/w map))
+       (let* ((tile (aref (game-map/tiles map) x y))
+              (wall (tile/blocked tile))
+              (visible (tile/visible tile))
+              (explored (tile/explored tile)))
+         (cond
+           (visible
+            (if wall
+              (setf (blt:background-color) (getf *color-map* :light-wall))
+              (setf (blt:background-color) (getf *color-map* :light-ground)))
+            (setf (blt:cell-char x y) #\Space))
 
+           (explored
+            (if wall
+             (setf (blt:background-color) (getf *color-map* :dark-wall))
+             (setf (blt:background-color) (getf *color-map* :dark-ground)))
+            (setf (blt:cell-char x y) #\Space))))))
+
+  (mapc #'draw entities)
+
+  (setf (blt:background-color) (blt:black))
+  (blt:refresh))
 ```
+
+Just a quick update to change what we draw based on what we can see and what we have seen.   And now, the map is much more mysterious!
+![The Age Of Exploration](../screenshots/part-4-4-fog.gif?raw=true "Seek and ye shall fret")
