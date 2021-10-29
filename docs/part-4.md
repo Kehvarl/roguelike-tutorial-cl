@@ -181,3 +181,32 @@ Now that we can light up the area around our player, let's make a few more chang
 
 ## Fog of War
 To fix the map visibility issue, let's implement some Fog of War!   Areas that haven't been explored will not be drawn at all, and areas we have explored, but which are outside of our field of view won't show if there are monsters or other things there.
+
+### Tracking our Exploration
+Fog of War requires some way for us to keep track of everything the player has seen.  To store this information, we'll make a new adjustment to our `tile` class:
+```lisp
+(defclass tile ()
+  (;;... Existing code...
+   (explored :initarg :explored
+             :accessor tile/explored
+             :initform nil)))
+```
+We'll just create a new slot to track the `explored` state of every tile, and start it out as `nil`.
+
+Now that we can track the explored state, we need to make sure we maintain it.  Fortunately there's an easy way to do that!  We're already setting the state of every tile the player can see when they can see it.  We'll just update the explored state at the same time, like so:
+
+```lisp
+(defun fov (map x y)
+  (reset-visibility map)
+
+  (dotimes (degree 360)
+        ;; ...Existing code...
+
+          (when (tile/block-sight (aref (game-map/tiles map) tx ty))
+            (setf (tile/visible (aref (game-map/tiles map) tx ty)) t)
+            (setf (tile/explored (aref (game-map/tiles map) tx ty) t))
+            (return))
+
+          (setf (tile/visible (aref (game-map/tiles map) tx ty)) t)
+          (setf (tile/explored (aref (game-map/tiles map) tx ty) t)))))))
+```

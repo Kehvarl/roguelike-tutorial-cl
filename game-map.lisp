@@ -12,7 +12,11 @@
                 :initform nil)
    (visible :initarg :visible
             :accessor tile/visible
-            :initform nil)))
+            :initform nil)
+   (explored :initarg :explored
+             :accessor tile/explored
+             :initform nil)))
+
 
 (defmethod initialize-instance :after ((tile tile) &rest initargs)
   (declare (ignore initargs))
