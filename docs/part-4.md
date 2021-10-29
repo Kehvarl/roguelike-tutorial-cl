@@ -202,11 +202,16 @@ Now that we can track the explored state, we need to make sure we maintain it.  
   (dotimes (degree 360)
         ;; ...Existing code...
 
-          (when (tile/block-sight (aref (game-map/tiles map) tx ty))
-            (setf (tile/visible (aref (game-map/tiles map) tx ty)) t)
-            (setf (tile/explored (aref (game-map/tiles map) tx ty) t))
-            (return))
-
+        (when (tile/block-sight (aref (game-map/tiles map) tx ty))
           (setf (tile/visible (aref (game-map/tiles map) tx ty)) t)
-          (setf (tile/explored (aref (game-map/tiles map) tx ty) t)))))))
+          (setf (tile/explored (aref (game-map/tiles map) tx ty)) t)
+          (return))
+
+        (setf (tile/visible (aref (game-map/tiles map) tx ty)) t)
+        (setf (tile/explored (aref (game-map/tiles map) tx ty)) t))))))
+```
+
+And finally, we need to draw the explored parts of the map while hiding those unexplored and mysterious regions.   To the `render-all` function!
+```lisp
+
 ```
