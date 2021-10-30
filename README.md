@@ -10,7 +10,7 @@ Based on and influenced by these projects:
 * ![Part 2 - The generic Entity, the render functions, and the map](./docs/part-2.md)
 * ![Part 3 - Generating a dungeon](./docs/part-3.md)
 * ![Part 4 - Field of view](./docs/part-4.md)
-* Part 5 - Placing enemies and kicking them (harmlessly)
+* ![Part 5 - Placing enemies and kicking them (harmlessly)](./docs/part-5.md)
 * Part 6 - Doing (and taking) some damage
 * Part 7 - Creating the Interface
 * Part 8 - Items and Inventory
