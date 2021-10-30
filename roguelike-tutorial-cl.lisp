@@ -47,7 +47,7 @@
              (setf (blt:background-color) (getf *color-map* :dark-ground)))
             (setf (blt:cell-char x y) #\Space))))))
 
-  (mapc #'draw entities)
+  (mapc #'(lambda (entity) (draw entity map)) entities)
 
   (setf (blt:background-color) (blt:black))
   (blt:refresh))
