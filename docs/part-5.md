@@ -33,3 +33,28 @@ There's nothing too fancy happening here:
   * `(let ((x (+ (random ... (y (+ (random...` pick a random cell in the current room
   * `(unless (entity-at entities x y)`  If there's not already an enemy on the given tile
     * `(nconc entities (list (make-instance...` Create an entity and add it to that tile
+
+Before we move this, let's make finding a random cell in a room part of the room itself:
+```lisp
+(defmethod random_cell ((rect rect))
+  (with-slots (x1 x2 y1 y2) rect
+    (let* ((w (- x2 x1 1))
+           (h (- y2 y1 1))
+           (x (+ (random w) (1+ x1)))
+           (y (+ (random h) (1+ y1))))
+      (values x y))))
+```
+It's a little more than 2 lines, but also a little easier to read
+
+Using it is as simple as swapping our `let` for a `multiple-value-bind`:
+```lisp
+(defmethod place-entities ((map game-map) (room rect) entities max-enemies-per-room)
+  (let ((num-monsters (random max-enemies-per-room)))
+    (dotimes (monster-index num-monsters)
+      (multiple-value-bind (x y) (random_cell room)
+        (unless (entity-at entities x y)
+          (if (< (random 100) 80)
+            (nconc entities (list (make-instance 'entity :x x :y y :color  (blt:green) :char #\o)))
+            (nconc entities (list (make-instance 'entity :x x :y y :color  (blt:yellow) :char #\T)))))))))
+
+```
