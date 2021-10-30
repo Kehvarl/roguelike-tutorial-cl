@@ -152,3 +152,9 @@
              (setf rooms (list new-room))
              (push new-room (cdr (last rooms))))
            (incf num-rooms)))))
+
+(defun entity-at (entities x y)
+  (dolist (entity entities)
+    (if (and (= (entity/x entity) x)
+             (= (entity/y entity) y))
+      (return entity))))
