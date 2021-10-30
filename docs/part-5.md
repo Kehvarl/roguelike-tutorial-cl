@@ -12,3 +12,24 @@ First up, we a way to check for an entity already in a location, that way we don
       (return entity))))
 ```
 This simply loops through the list of entities and returns the first one where the `x` and `y` positions match the target position.  In fact, it doesn't even use our map, and we could probably make it part of the `entity` file or even our `entity` class.  For now, it is fine in `game-map` where we'll be using it.
+
+Now that we can check for conflicts, let's spawn a few beasts:
+```lisp
+
+(defmethod place-entities ((map game-map) (room rect) entities max-enemies-per-room)
+  (let ((num-monsters (random max-enemies-per-room)))
+    (dotimes (monster-index num-monsters)
+      (let ((x (+ (random (round (/ (- (rect/x2 room) (rect/x1 room) 1) 2))) (1+ (rect/x1 room))))
+            (y (+ (random (round (/ (- (rect/y2 room) (rect/y1 room) 1) 2))) (1+ (rect/y1 room)))))
+        (unless (entity-at entities x y)
+          (if (< (random 100) 80)
+            (nconc entities (list (make-instance 'entity :x x :y y :color  (blt:green) :char #\o)))
+            (nconc entities (list (make-instance 'entity :x x :y y :color  (blt:yellow) :char #\T)))))))))
+
+
+```
+There's nothing too fancy happening here:
+* `(let ((num-monsters (random max-enemies-per-room)))` pick a random number of monsters between 0 and some max value.  Then loop that number of times
+  * `(let ((x (+ (random ... (y (+ (random...` pick a random cell in the current room
+  * `(unless (entity-at entities x y)`  If there's not already an enemy on the given tile
+    * `(nconc entities (list (make-instance...` Create an entity and add it to that tile

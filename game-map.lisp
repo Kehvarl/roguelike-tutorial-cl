@@ -158,3 +158,13 @@
     (if (and (= (entity/x entity) x)
              (= (entity/y entity) y))
       (return entity))))
+
+(defmethod place-entities ((map game-map) (room rect) entities max-enemies-per-room)
+  (let ((num-monsters (random max-enemies-per-room)))
+    (dotimes (monster-index num-monsters)
+      (let ((x (+ (random (round (/ (- (rect/x2 room) (rect/x1 room) 1) 2))) (1+ (rect/x1 room))))
+            (y (+ (random (round (/ (- (rect/y2 room) (rect/y1 room) 1) 2))) (1+ (rect/y1 room)))))
+        (unless (entity-at entities x y)
+          (if (< (random 100) 80)
+            (nconc entities (list (make-instance 'entity :x x :y y :color  (blt:green) :char #\o)))
+            (nconc entities (list (make-instance 'entity :x x :y y :color  (blt:yellow) :char #\T)))))))))
