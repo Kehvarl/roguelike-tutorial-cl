@@ -242,3 +242,26 @@ And finally, we need to draw the explored parts of the map while hiding those un
 
 Just a quick update to change what we draw based on what we can see and what we have seen.   And now, the map is much more mysterious!
 ![The Age Of Exploration](../screenshots/part-4-4-fog.gif?raw=true "Seek and ye shall fret")
+
+The only remaining fix is all those pesky entities we shouldn't be able to see since they're not close to us.  Over in our `enttiy` file, let's make a modification to the `draw` method:
+
+```lisp
+(defgeneric draw (e map))
+(defmethod draw ((e entity) (map game-map))
+  (with-slots (x y char color) e
+    (if (tile/visible (aref (game-map/tiles map) x y))
+      (setf (blt:background-color) (blt:cell-background-color x y)
+            (blt:color) color
+            (blt:cell-char x y) char))))
+```
+Since we're changing our method to accept more parameters, we need to use the `defgeneric` trick from earlier.   Good practice would probably be to do this for all our methods.
+
+Of course, now our game is broken, and complains that `draw` expects 2 parameters.  We can jump back to our `render-all` and change how we call this method:
+```lisp
+...
+(mapc #'(lambda (entity) (draw entity map)) entities)
+...
+```
+This is slightly more complicated than the old way of calling the function, because we need to be able to pass the map along, and `mapc` doesn't have an easy way to pass in 2 parameters.  Instead, we define a lambda, which is basically a function with no name.  This lambda expects the current entity (which `mapc` can easily get for us), then uses the entity and the map to call `draw`
+
+![Things that go bump in the night](../screenshots/part-4-6-hidden-monstersgif?raw=true "They lurk in the darkness")
