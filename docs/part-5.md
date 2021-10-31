@@ -56,5 +56,29 @@ Using it is as simple as swapping our `let` for a `multiple-value-bind`:
           (if (< (random 100) 80)
             (nconc entities (list (make-instance 'entity :x x :y y :color  (blt:green) :char #\o)))
             (nconc entities (list (make-instance 'entity :x x :y y :color  (blt:yellow) :char #\T)))))))))
-
 ```
+
+Now we can find a random tile in a room and place an entity there!  Let's actually use these tools in our `make-map` function:
+```lisp
+(defgeneric make-map (map max-rooms room-min-size room-max-size map-width map-height player entities max-enemies-per-room))
+(defmethod make-map ((map game-map) max-rooms room-min-size room-max-size map-width map-height player entities max-enemies-per-room)
+  (do* ((rooms nil)
+  ;;;... Existing code...
+    (place-entities map new-room entities max-enemies-per-room)
+    (if (null rooms)
+      (setf rooms (list new-room))
+      (push new-room (cdr (last rooms))))
+    (incf num-rooms)))))
+```
+We've had to redefine our generic since we need 2 new variables: `entities` and `max-enemies-per-room`.   Then we just call our new method and when we test...   Oh right, we haven't updated our `main` to pass those new values to our `make-map`.  Let's do that now!
+
+```lisp
+(make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player entities *max-enemies-per-room*)
+```
+And now let's define that new constant right up near the top of our main file:
+```lisp
+(defparameter *max-enemies-per-room* 5)
+```
+
+And voila!  Monsters abound!
+![I was working in the lab](../screenshots/part-5-2-monstersgif?raw=true "late one night")

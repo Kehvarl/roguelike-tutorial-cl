@@ -123,8 +123,8 @@
                      :y-start start-y :y-end (1+ end-y))
       (set-tile-slots tile :blocked nil :block-sight nil))))
 
-(defgeneric make-map (map max-rooms room-min-size room-max-size map-width map-height player))
-(defmethod make-map ((map game-map) max-rooms room-min-size room-max-size map-width map-height player)
+(defgeneric make-map (map max-rooms room-min-size room-max-size map-width map-height player entities max-enemies-per-room))
+(defmethod make-map ((map game-map) max-rooms room-min-size room-max-size map-width map-height player entities max-enemies-per-room)
   (do* ((rooms nil)
         (num-rooms 0)
         (room-index 0 (1+ room-index))
@@ -156,10 +156,11 @@
                         (t
                          (create-v-tunnel map prev-y new-y new-x)
                          (create-h-tunnel map prev-x new-x prev-y)))))
-           (if (null rooms)
-             (setf rooms (list new-room))
-             (push new-room (cdr (last rooms))))
-           (incf num-rooms)))))
+          (place-entities map new-room entities max-enemies-per-room)
+          (if (null rooms)
+            (setf rooms (list new-room))
+            (push new-room (cdr (last rooms))))
+          (incf num-rooms)))))
 
 (defun entity-at (entities x y)
   (dolist (entity entities)
