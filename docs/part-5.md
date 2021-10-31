@@ -56,5 +56,6 @@ Using it is as simple as swapping our `let` for a `multiple-value-bind`:
           (if (< (random 100) 80)
             (nconc entities (list (make-instance 'entity :x x :y y :color  (blt:green) :char #\o)))
             (nconc entities (list (make-instance 'entity :x x :y y :color  (blt:yellow) :char #\T)))))))))
-
 ```
+
+Now we can find a random tile in a room and place an entity there!  Let's actually use these tools in our `make-map` function:
