@@ -4,7 +4,8 @@
   ((x :initarg :x :accessor entity/x)
    (y :initarg :y :accessor entity/y)
    (char :initarg :char :accessor entity/char)
-   (color :initarg :color :accessor entity/color)))
+   (color :initarg :color :accessor entity/color)
+   (blocks :initarg :blocks :accessor entity/blocks :initform nil)))
 
 ;; Adjust the X,Y position of an entity by the indicated amount.
 (defmethod move ((e entity) dx dy)
