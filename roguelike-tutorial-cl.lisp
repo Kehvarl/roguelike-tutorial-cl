@@ -77,12 +77,15 @@
          (exit (getf action :quit)))
 
     (when move
-      (unless (blocked-p map
-                         (+ (entity/x player) (car move))
-                         (+ (entity/y player) (cdr move)))
-        (move player (car move) (cdr move))
-        (fov map (entity/x player) (entity/y player))))
-
+      (let ((destination-x (+ (entity/x player) (car move)))
+            (destination-y (+ (entity/y player) (cdr move))))
+        (unless (blocked-p map destination-x destination-y)
+          (let ((target (blocking-entity-at entities destination-x destination-y)))
+            (cond (target
+                   (format t "You kick the enemy.~%"))
+                  (t
+                   (move player (car move) (cdr move))
+                   (fov map (entity/x player) (entity/y player))))))))
     exit))
 
 ;; Create a terminal window using the settings in our `config` function.
@@ -96,13 +99,9 @@
                             :x (/ *screen-width* 2)
                             :y (/ *screen-height* 2)
                             :char #\@
-                            :color (blt:white)))
-           (npc  (make-instance 'entity
-                                :x (- (/ *screen-width* 2) 5)
-                                :y (/ *screen-height* 2)
-                                :char #\@
-                                :color (blt:yellow)))
-           (entities (list player npc))
+                            :color (blt:white)
+                            :blocks t))
+           (entities (list player))
            (map (make-instance 'game-map :w *map-width* :h *map-height*)))
       (make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player entities *max-enemies-per-room*)
       (fov map (entity/x player) (entity/y player))

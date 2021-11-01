@@ -81,4 +81,74 @@ And now let's define that new constant right up near the top of our main file:
 ```
 
 And voila!  Monsters abound!
-![I was working in the lab](../screenshots/part-5-2-monstersgif?raw=true "late one night")
+![I was working in the lab](../screenshots/part-5-2-monsters.gif?raw=true "late one night")
+
+## Colliding with the Enemy
+So far we've found a way to draw on the screen, created an entity class, made a way for our player to move around, given the player a place to explore, and populated that place with horrible creatures out of the depths of our twisted imaginations.   Let's make it so the player can't walk through those enemies!
+
+For starters, we'll make an adjustment to our `entity` class so that we can decide if they block a tile or not.
+```lisp
+(defclass entity ()
+  ((x :initarg :x :accessor entity/x)
+   (y :initarg :y :accessor entity/y)
+   (char :initarg :char :accessor entity/char)
+   (color :initarg :color :accessor entity/color)
+   (blocks :initarg :blocks :accessor entity/blocks :initform nil)))
+```
+Here we're adding a `blocks` slot to our entities.  By default they're ghostly apparitions that we can walk right through.
+
+Next we update the places where we call `make-instance 'entity`, such as our `main` function:
+```lisp
+;;...
+(let* (( player (make-instance 'entity
+                        :x (/ *screen-width* 2)
+                        :y (/ *screen-height* 2)
+                        :char #\@
+                        :color (blt:white)
+                        :blocks t))
+       (entities (list player))
+;;...
+```
+You'll note I've also finally taken away that NPC we don't need anymore.
+
+We also need to update our calls where we create the monsters:
+```lisp
+;;...
+(nconc entities (list (make-instance 'entity :x x :y y :color  (blt:green) :char #\o :blocks t)))
+(nconc entities (list (make-instance 'entity :x x :y y :color  (blt:yellow) :char #\T :blocks t)))
+;;...
+```
+
+And now every entity we currently spawn has a tag saying it should block movement.  The big problem now is that nothing implements that feature.  So let's pop over to our `game-tick` and change the player movement routine:
+
+```lisp
+(defun game-tick (player entities map)
+  (render-all entities map)
+  (let* ((action (handle-keys))
+         (move (getf action :move))
+         (exit (getf action :quit)))
+
+    (when move
+      (let ((destination-x (+ (entity/x player) (car move)))
+            (destination-y (+ (entity/y player) (cdr move))))
+        (unless (blocked-p map destination-x destination-y)
+          (let ((target (blocking-entity-at entities destination-x destination-y)))
+            (cond (target
+                   (format t "You kick the enemy.~%"))
+                  (t
+                   (move player (car move) (cdr move))
+                   (fov map (entity/x player) (entity/y player))))))))
+    exit))
+```
+Rather than using our existing `entity-at`, I've assumed to existence of a `blocking-entity-at`, so let's implement it real quick.  Over in `game-map`:
+```lisp
+(defun blocking-entity-at (entities x y)
+  (dolist (entity entities)
+    (if (and (= (entity/x entity) x)
+             (= (entity/y entity) y)
+             (entity/blocks entity))
+      (return entity))))
+```
+
+And now if you run the game and try to walk over an enemy, you get a message:
+![These feet were made for walking](../screenshots/part-5-4-kick.gif?raw=true "And I'm all outta bubblegum.")
