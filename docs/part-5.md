@@ -97,6 +97,16 @@ For starters, we'll make an adjustment to our `entity` class so that we can deci
 ```
 Here we're adding a `blocks` slot to our entities.  By default they're ghostly apparitions that we can walk right through.
 
+While we're in here, let's add a routine to check if there is a blocking entity at a given location:
+```lisp
+(defun blocking-entity-at (entities x y)
+  (dolist (entity entities)
+    (if (and (= (entity/x entity) x)
+             (= (entity/y entity) y)
+             (entity/blocks entity))
+      (return entity))))
+```
+
 Next we update the places where we call `make-instance 'entity`, such as our `main` function:
 ```lisp
 ;;...
@@ -139,15 +149,6 @@ And now every entity we currently spawn has a tag saying it should block movemen
                    (move player (car move) (cdr move))
                    (fov map (entity/x player) (entity/y player))))))))
     exit))
-```
-Rather than using our existing `entity-at`, I've assumed to existence of a `blocking-entity-at`, so let's implement it real quick.  Over in `game-map`:
-```lisp
-(defun blocking-entity-at (entities x y)
-  (dolist (entity entities)
-    (if (and (= (entity/x entity) x)
-             (= (entity/y entity) y)
-             (entity/blocks entity))
-      (return entity))))
 ```
 
 And now if you run the game and try to walk over an enemy, you get a message:
