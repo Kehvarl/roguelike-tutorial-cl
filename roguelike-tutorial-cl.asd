@@ -8,7 +8,7 @@
   :serial t
   :depends-on (#:cl-blt)
   :components ((:file "package")
-               (:file "entity")
                (:file "game-map")
+               (:file "entity")
                (:file "fov")
                (:file "roguelike-tutorial-cl")))
