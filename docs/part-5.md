@@ -153,3 +153,17 @@ And now every entity we currently spawn has a tag saying it should block movemen
 
 And now if you run the game and try to walk over an enemy, you get a message:
 ![These feet were made for walking](../screenshots/part-5-4-kick.gif?raw=true "And I'm all outta bubblegum.")
+
+While running around and bullying enemies by kicking them has its high points, the message isn't that great.  For one thing we don't even know what enemy we kicked!  Let's fix that:
+
+We'll start by modifying our `entity` class again:
+```lisp
+(defclass entity ()
+  ((name :initarg :name :accessor entity/name)
+   (x :initarg :x :accessor entity/x)
+   (y :initarg :y :accessor entity/y)
+   (char :initarg :char :accessor entity/char)
+   (color :initarg :color :accessor entity/color)
+   (blocks :initarg :blocks :accessor entity/blocks :initform nil)))
+```
+... and adding a slot for the entity name!
