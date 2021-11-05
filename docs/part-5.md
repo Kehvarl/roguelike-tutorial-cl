@@ -167,3 +167,22 @@ We'll start by modifying our `entity` class again:
    (blocks :initarg :blocks :accessor entity/blocks :initform nil)))
 ```
 ... and adding a slot for the entity name!
+
+Now let's make sure we name all our entities when we create them (name doesn't have a default, so it's mandatory):
+
+First our player:
+```Lisp
+(let* (( player (make-instance 'entity
+                        :name "Player"
+                        :x (/ *screen-width* 2)
+                        :y (/ *screen-height* 2)
+                        :char #\@
+                        :color (blt:white)
+                        :blocks t))
+```
+
+Then our monsters:
+```lisp
+(nconc entities (list (make-instance 'entity :name "Orc" :x x :y y :color  (blt:green) :char #\o :blocks t)))
+(nconc entities (list (make-instance 'entity :name "Troll" :x x :y y :color  (blt:yellow) :char #\T :blocks t)))))))))
+```

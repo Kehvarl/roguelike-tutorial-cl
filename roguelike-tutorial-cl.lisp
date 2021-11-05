@@ -96,6 +96,7 @@
   (blt:with-terminal
     (config)
     (let* (( player (make-instance 'entity
+                            :name "Player"
                             :x (/ *screen-width* 2)
                             :y (/ *screen-height* 2)
                             :char #\@

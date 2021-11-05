@@ -181,5 +181,5 @@
       (multiple-value-bind (x y) (random_cell room)
         (unless (entity-at entities x y)
           (if (< (random 100) 80)
-            (nconc entities (list (make-instance 'entity :x x :y y :color  (blt:green) :char #\o :blocks t)))
-            (nconc entities (list (make-instance 'entity :x x :y y :color  (blt:yellow) :char #\T :blocks t)))))))))
+            (nconc entities (list (make-instance 'entity :name "Orc" :x x :y y :color  (blt:green) :char #\o :blocks t)))
+            (nconc entities (list (make-instance 'entity :name "Troll" :x x :y y :color  (blt:yellow) :char #\T :blocks t)))))))))
