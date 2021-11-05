@@ -82,7 +82,7 @@
         (unless (blocked-p map destination-x destination-y)
           (let ((target (blocking-entity-at entities destination-x destination-y)))
             (cond (target
-                   (format t "You kick the enemy.~%"))
+                   (format t "~A kicks the ~A.~%" (entity/name player) (entity/name target)))
                   (t
                    (move player (car move) (cdr move))
                    (fov map (entity/x player) (entity/y player))))))))

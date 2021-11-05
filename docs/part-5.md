@@ -186,3 +186,9 @@ Then our monsters:
 (nconc entities (list (make-instance 'entity :name "Orc" :x x :y y :color  (blt:green) :char #\o :blocks t)))
 (nconc entities (list (make-instance 'entity :name "Troll" :x x :y y :color  (blt:yellow) :char #\T :blocks t)))))))))
 ```
+
+And now we use that name in our horrible assault upon the defenseless:
+```lisp
+(format t "~A kicks the ~A.~%" (entity/name player) (entity/name target)))
+```
+![Taking names](../screenshots/part-5-3-kick.gif?raw=true "Making a List")
