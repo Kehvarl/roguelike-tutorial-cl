@@ -153,3 +153,42 @@ And now every entity we currently spawn has a tag saying it should block movemen
 
 And now if you run the game and try to walk over an enemy, you get a message:
 ![These feet were made for walking](../screenshots/part-5-4-kick.gif?raw=true "And I'm all outta bubblegum.")
+
+While running around and bullying enemies by kicking them has its high points, the message isn't that great.  For one thing we don't even know what enemy we kicked!  Let's fix that:
+
+We'll start by modifying our `entity` class again:
+```lisp
+(defclass entity ()
+  ((name :initarg :name :accessor entity/name)
+   (x :initarg :x :accessor entity/x)
+   (y :initarg :y :accessor entity/y)
+   (char :initarg :char :accessor entity/char)
+   (color :initarg :color :accessor entity/color)
+   (blocks :initarg :blocks :accessor entity/blocks :initform nil)))
+```
+... and adding a slot for the entity name!
+
+Now let's make sure we name all our entities when we create them (name doesn't have a default, so it's mandatory):
+
+First our player:
+```Lisp
+(let* (( player (make-instance 'entity
+                        :name "Player"
+                        :x (/ *screen-width* 2)
+                        :y (/ *screen-height* 2)
+                        :char #\@
+                        :color (blt:white)
+                        :blocks t))
+```
+
+Then our monsters:
+```lisp
+(nconc entities (list (make-instance 'entity :name "Orc" :x x :y y :color  (blt:green) :char #\o :blocks t)))
+(nconc entities (list (make-instance 'entity :name "Troll" :x x :y y :color  (blt:yellow) :char #\T :blocks t)))))))))
+```
+
+And now we use that name in our horrible assault upon the defenseless:
+```lisp
+(format t "~A kicks the ~A.~%" (entity/name player) (entity/name target)))
+```
+![Taking names](../screenshots/part-5-3-kick.gif?raw=true "Making a List")
