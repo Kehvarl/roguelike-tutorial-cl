@@ -191,4 +191,7 @@ And now we use that name in our horrible assault upon the defenseless:
 ```lisp
 (format t "~A kicks the ~A.~%" (entity/name player) (entity/name target)))
 ```
-![Taking names](../screenshots/part-5-3-kick.gif?raw=true "Making a List")
+![Taking names](../screenshots/part-5-6-taking-names.gif?raw=true "Making a List")
+
+## Taking Turns
+The enemies don't do anything yet, and even if we set them up to do things the game loop just constantly waits on the player to move.  To fix this, we'll implement a couple of states so the game knows if it should be waiting for the player, or giving our entities their chance to act.
