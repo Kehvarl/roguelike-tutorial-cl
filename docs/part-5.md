@@ -195,3 +195,8 @@ And now we use that name in our horrible assault upon the defenseless:
 
 ## Taking Turns
 The enemies don't do anything yet, and even if we set them up to do things the game loop just constantly waits on the player to move.  To fix this, we'll implement a couple of states so the game knows if it should be waiting for the player, or giving our entities their chance to act.
+
+We start by defining a type to help us track our current state.  We can put this into our main file since that's where we'll use it. Add this just after our `defparameter`s:
+```lisp
+(deftype game-states () '(member :player-turn :enemy-turn :exit))
+```
