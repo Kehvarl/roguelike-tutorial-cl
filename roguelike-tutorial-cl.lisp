@@ -14,6 +14,8 @@
 (defparameter *max-rooms* 30)
 (defparameter *max-enemies-per-room* 5)
 
+(deftype game-states () '(member :player-turn :enemy-turn :exit))
+
 ;; Terminal Window Settings.
 (defun config ()
   (blt:set "window.resizeable = true")
