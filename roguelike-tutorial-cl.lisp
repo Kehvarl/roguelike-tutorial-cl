@@ -89,10 +89,10 @@
                   (t
                    (move player (car move) (cdr move))
                    (fov map (entity/x player) (entity/y player))))
-            (setf game-state :enemy-turn))))
-      (when exit
-        (setf game-state :exit)))
-    
+            (setf game-state :enemy-turn)))))
+    (when exit
+      (setf game-state :exit))
+
     (when (eql game-state :enemy-turn)
       (dolist (entity entities)
         (if (not (eql player entity))
@@ -121,5 +121,5 @@
            (map (make-instance 'game-map :w *map-width* :h *map-height*)))
       (make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player entities *max-enemies-per-room*)
       (fov map (entity/x player) (entity/y player))
-      (do ((exit nil (game-tick player entities map)))
-          (exit)))))
+      (do ((game-state :player-turn (game-tick player entities map game-state)))
+          ((eql game-state :exit))))))

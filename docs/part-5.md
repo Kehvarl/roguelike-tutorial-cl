@@ -227,7 +227,7 @@ Before we get to the enemy turn, let's handle exit-state stuff.  If the player d
 
 ```lisp
 (when exit
-  (setf game-state :exit)))))
+  (setf game-state :exit))
 ```  
 
 Now we can handle `:enemy-turn`  remember that this needs to set the state back to `:player-turn` as the very last thing so that we dont' get stuck giving the enemies unlimited moves.
@@ -245,3 +245,19 @@ The last thing we do here is change the return-value of `game-tick` to send back
 ```lisp
 game-state)
 ```
+
+Now we just need to make sure our `main` function can correctly use this new `game-tick` of ours:
+
+```lisp
+(do ((game-state :player-turn (game-tick player entities map game-state)))
+    ((eql game-state :exit))))))
+```
+
+If you remember our breakdown of `do` this does a few things:
+* Create a new variable named `game-state`.
+  * This variable is initially `:player-turn`
+  * Each cycle through the loop, update this variable by calling `game-tick`
+* If `game-state` is set to `:exit` then we exit the `do` loop.  Otherwise loop again.
+
+Running the game again and we have some monsters taking their turns standing around:
+![Idle Hands](../screenshots/part-5-8-idle-hands.gif?raw=true "The Dragons Playground")
