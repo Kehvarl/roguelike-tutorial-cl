@@ -200,3 +200,64 @@ We start by defining a type to help us track our current state.  We can put this
 ```lisp
 (deftype game-states () '(member :player-turn :enemy-turn :exit))
 ```
+
+We will make use of our new state-tracking by making some changes to `game-tick`.  First we make sure `game-tick`can accept a game-state argument, and knows that this is of the new type we just created.
+```Lisp
+(defun game-tick (player entities map game-state)
+  (declare (type game-states game-state))
+```
+
+Next up we modify the tick so it can separate player-turn actions from other stuff.   For simplicity's sake we're just going to modify our check for the player's movement.   After the player gets their turn, we make sure the enemy gets theirs.
+
+```lisp
+(when (and move (eql game-state :player-turn))
+  (let ((destination-x (+ (entity/x player) (car move)))
+        (destination-y (+ (entity/y player) (cdr move))))
+    (unless (blocked-p map destination-x destination-y)
+      (let ((target (blocking-entity-at entities destination-x destination-y)))
+        (cond (target
+               (format t "~A kicks the ~A.~%" (entity/name player) (entity/name target)))
+              (t
+               (move player (car move) (cdr move))
+               (fov map (entity/x player) (entity/y player))))
+        (setf game-state :enemy-turn)))))
+```
+
+Before we get to the enemy turn, let's handle exit-state stuff.  If the player does something that would end the game, we set the game-state to `:exit` so that can happen:
+
+```lisp
+(when exit
+  (setf game-state :exit))
+```  
+
+Now we can handle `:enemy-turn`  remember that this needs to set the state back to `:player-turn` as the very last thing so that we dont' get stuck giving the enemies unlimited moves.
+```lisp
+
+(when (eql game-state :enemy-turn)
+  (dolist (entity entities)
+    (if (not (eql player entity))
+        (format t "The ~A sits idly.~%" (entity/name entity))))
+  (setf game-state :player-turn)))
+```
+
+The last thing we do here is change the return-value of `game-tick` to send back the new game-state:
+
+```lisp
+game-state)
+```
+
+Now we just need to make sure our `main` function can correctly use this new `game-tick` of ours:
+
+```lisp
+(do ((game-state :player-turn (game-tick player entities map game-state)))
+    ((eql game-state :exit))))))
+```
+
+If you remember our breakdown of `do` this does a few things:
+* Create a new variable named `game-state`.
+  * This variable is initially `:player-turn`
+  * Each cycle through the loop, update this variable by calling `game-tick`
+* If `game-state` is set to `:exit` then we exit the `do` loop.  Otherwise loop again.
+
+Running the game again and we have some monsters taking their turns standing around:
+![Idle Hands](../screenshots/part-5-8-idle-hands.gif?raw=true "The Dragons Playground")
