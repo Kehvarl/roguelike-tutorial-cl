@@ -8,3 +8,10 @@ The key to our new goal is the Component.  A component is a feature that our ent
 
 ### New file
 We will start with creating a new file named `components.lisp`  Don't forget to `in-package` it and add it to our .asd
+
+For starters we'll create a generic `component` class that our other components can inherit from, so we can give them some consistency:
+```lisp
+(defclass component ()
+  ((owner :initarg :owner :accessor component/owner)))
+```
+No new concepts here, but this is the core of our entire new composition system.
