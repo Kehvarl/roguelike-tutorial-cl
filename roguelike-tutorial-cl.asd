@@ -9,6 +9,7 @@
   :depends-on (#:cl-blt)
   :components ((:file "package")
                (:file "game-map")
+               (:file "components")
                (:file "entity")
                (:file "fov")
                (:file "roguelike-tutorial-cl")))
