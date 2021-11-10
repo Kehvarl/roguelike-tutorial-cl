@@ -15,3 +15,8 @@ For starters we'll create a generic `component` class that our other components 
   ((owner :initarg :owner :accessor component/owner)))
 ```
 No new concepts here, but this is the core of our entire new composition system.
+
+Next up we will define the first component we'll actually use:
+```lisp
+
+```
