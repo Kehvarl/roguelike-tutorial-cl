@@ -18,5 +18,18 @@ No new concepts here, but this is the core of our entire new composition system.
 
 Next up we will define the first component we'll actually use:
 ```lisp
+(defclass fighter (component)
+  ((max-hp :initarg :max-hp :accessor fighter/max-hp :initform nil)
+   (hp :initarg :hp :accessor fighter/hp)
+   (defense :initarg :defense :accessor fighter/defense)
+   (power :initarg :power :accessor fithger/power)))
+```
 
+Let's also create a component to represent AI behavior and a take-turn method for it:
+```Lisp
+(defclass basic-monster (component) ())
+
+(defgeneric take-turn (component))
+(defmethod take-turn ((component basic-monster))
+  (format t "The ~A wonders when it will get to move.~%" (component/owner component)))
 ```
