@@ -7,7 +7,7 @@
   ((max-hp :initarg :max-hp :accessor fighter/max-hp :initform nil)
    (hp :initarg :hp :accessor fighter/hp)
    (defense :initarg :defense :accessor fighter/defense)
-   (power :initarg :power :accessor fithger/power)))
+   (power :initarg :power :accessor fighter/power)))
 
 (defclass basic-monster (component) ())
 

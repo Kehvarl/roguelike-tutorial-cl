@@ -6,7 +6,17 @@
    (y :initarg :y :accessor entity/y)
    (char :initarg :char :accessor entity/char)
    (color :initarg :color :accessor entity/color)
-   (blocks :initarg :blocks :accessor entity/blocks :initform nil)))
+   (blocks :initarg :blocks :accessor entity/blocks :initform nil)
+   (fighter :initarg :fighter :accessor entity/fighter :initform nil)
+   (ai :initarg :fighter :accessor entity/ai :initform nil)))
+
+(defmethod initialize-instance :after ((entity entity) &rest initargs)
+  (declare (ignore initargs))
+  (with-slots (fighter ai) entity
+    (when fighter
+      (setf (component/owner fighter) entity))
+    (when ai
+      (setf (component/owner ai) entity))))
 
 ;; Adjust the X,Y position of an entity by the indicated amount.
 (defmethod move ((e entity) dx dy)
