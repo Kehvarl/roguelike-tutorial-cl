@@ -22,14 +22,45 @@ Next up we will define the first component we'll actually use:
   ((max-hp :initarg :max-hp :accessor fighter/max-hp :initform nil)
    (hp :initarg :hp :accessor fighter/hp)
    (defense :initarg :defense :accessor fighter/defense)
-   (power :initarg :power :accessor fithger/power)))
+   (power :initarg :power :accessor fighter/power)))
 ```
 
 Let's also create a component to represent AI behavior and a take-turn method for it:
 ```Lisp
 (defclass basic-monster (component) ())
+date
+man date
+
+qsudo date 111117562021
+sudo apt uupdatesudo apt upgraded-array-element-typeps -ae
 
 (defgeneric take-turn (component))
 (defmethod take-turn ((component basic-monster))
   (format t "The ~A wonders when it will get to move.~%" (component/owner component)))
 ```
+
+Let's set up our entity to handle components:
+```lisp
+(defclass entity ()
+  ((name :initarg :name :accessor entity/name)
+   (x :initarg :x :accessor entity/x)
+   (y :initarg :y :accessor entity/y)
+   (char :initarg :char :accessor entity/char)
+   (color :initarg :color :accessor entity/color)
+   (blocks :initarg :blocks :accessor entity/blocks :initform nil)
+   (fighter :initarg :fighter :accessor entity/fighter :initform nil)
+   (ai :initarg :fighter :accessor entity/ai :initform nil)))
+```
+Here we've added 2 new slots to our entity, and initialized them to `nil`.  We'll also create an after-initialize method to make components more useful:
+
+```lisp
+(defmethod initialize-instance :after ((entity entity) &rest initargs)
+  (declare (ignore initargs))
+  (with-slots (fighter ai) entity
+    (when fighter
+      (setf (component/owner fighter) entity))
+    (when ai
+      (setf (component/owner ai) entity))))
+```
+
+Here, when we create an entity, if we've set a fighter or ai component, we make sure to initialize those component's `owner` reference to the entity we created.  We can use this later to test for things and make changes.
