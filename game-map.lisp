@@ -180,6 +180,16 @@
     (dotimes (monster-index num-monsters)
       (multiple-value-bind (x y) (random_cell room)
         (unless (entity-at entities x y)
-          (if (< (random 100) 80)
-            (nconc entities (list (make-instance 'entity :name "Orc" :x x :y y :color  (blt:green) :char #\o :blocks t)))
-            (nconc entities (list (make-instance 'entity :name "Troll" :x x :y y :color  (blt:yellow) :char #\T :blocks t)))))))))
+          (cond ((< (random 100) 80)
+                 (let* ((fighter-component (make-instance 'fighter :hp 10 :defense 0 :power 3))
+                        (ai-component (make-instance 'basic-monster))
+                        (orc (make-instance 'entity :name "Orc" :x x :y y :color  (blt:green) :char #\o :blocks t
+                                                    :fighter fighter-component :ai ai-component)))
+                   (nconc entities (list orc))))
+
+                (t
+                  (let* ((fighter-component (make-instance 'fighter :hp 16 :defense 1 :power 4))
+                         (ai-component (make-instance 'basic-monster))
+                         (troll (make-instance 'entity :name "Troll" :x x :y y :color  (blt:yellow) :char #\T :blocks t
+                                                       :fighter fighter-component :ai ai-component)))
+                    (nconc entities (list troll))))))))))

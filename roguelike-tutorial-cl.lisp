@@ -110,13 +110,19 @@
 (defun main()
   (blt:with-terminal
     (config)
-    (let* (( player (make-instance 'entity
-                            :name "Player"
-                            :x (/ *screen-width* 2)
-                            :y (/ *screen-height* 2)
-                            :char #\@
-                            :color (blt:white)
-                            :blocks t))
+    (let* ((fighter-component (make-instance 'fighter
+                                             :hp 30
+                                             :defense 2
+                                             :power 5))
+           (player (make-instance 'entity
+                           :name "Player"
+                           :x (/ *screen-width* 2)
+                           :y (/ *screen-height* 2)
+                           :char #\@
+                           :color (blt:white)
+                           :blocks t
+                           :fighter fighter-component))
+
            (entities (list player))
            (map (make-instance 'game-map :w *map-width* :h *map-height*)))
       (make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player entities *max-enemies-per-room*)

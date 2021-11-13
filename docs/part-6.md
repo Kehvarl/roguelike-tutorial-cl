@@ -64,3 +64,24 @@ Here we've added 2 new slots to our entity, and initialized them to `nil`.  We'l
 ```
 
 Here, when we create an entity, if we've set a fighter or ai component, we make sure to initialize those component's `owner` reference to the entity we created.  We can use this later to test for things and make changes.
+
+And now we can change our Player entity to include a fighter component, like so:
+```lisp
+(let* ((fighter-component (make-instance 'fighter
+                                         :hp 30
+                                         :defense 2
+                                         :power 5))
+       (player (make-instance 'entity
+                       :name "Player"
+                       :x (/ *screen-width* 2)
+                       :y (/ *screen-height* 2)
+                       :char #\@
+                       :color (blt:white)
+                       :blocks t
+                       :fighter fighter-component))
+```
+
+We'll do the same for those monsters we've scattered around the map:
+```lisp
+
+```
