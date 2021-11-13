@@ -94,9 +94,8 @@
       (setf game-state :exit))
 
     (when (eql game-state :enemy-turn)
-      (dolist (entity entities)
-        (if (not (eql player entity))
-            (format t "The ~A sits idly.~%" (entity/name entity))))
+      (dolist (entity (remove-if-not #'entity/ai entities))
+        (take-turn (entity/ai entity)))
       (setf game-state :player-turn)))
 
   game-state)

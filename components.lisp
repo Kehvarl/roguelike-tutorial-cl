@@ -13,4 +13,4 @@
 
 (defgeneric take-turn (component))
 (defmethod take-turn ((component basic-monster))
-  (format t "The ~A wonders when it will get to move.~%" (component/owner component)))
+  (format t "The ~A wonders when it will get to move.~%" (entity/name (component/owner component))))

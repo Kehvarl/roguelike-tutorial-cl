@@ -8,7 +8,7 @@
    (color :initarg :color :accessor entity/color)
    (blocks :initarg :blocks :accessor entity/blocks :initform nil)
    (fighter :initarg :fighter :accessor entity/fighter :initform nil)
-   (ai :initarg :fighter :accessor entity/ai :initform nil)))
+   (ai :initarg :ai :accessor entity/ai :initform nil)))
 
 (defmethod initialize-instance :after ((entity entity) &rest initargs)
   (declare (ignore initargs))

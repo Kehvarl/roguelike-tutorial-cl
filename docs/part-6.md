@@ -36,7 +36,7 @@ sudo apt uupdatesudo apt upgraded-array-element-typeps -ae
 
 (defgeneric take-turn (component))
 (defmethod take-turn ((component basic-monster))
-  (format t "The ~A wonders when it will get to move.~%" (component/owner component)))
+  (format t "The ~A wonders when it will get to move.~%" (entity/name (component/owner component))))
 ```
 
 Let's set up our entity to handle components:
@@ -49,7 +49,7 @@ Let's set up our entity to handle components:
    (color :initarg :color :accessor entity/color)
    (blocks :initarg :blocks :accessor entity/blocks :initform nil)
    (fighter :initarg :fighter :accessor entity/fighter :initform nil)
-   (ai :initarg :fighter :accessor entity/ai :initform nil)))
+   (ai :initarg :ai :accessor entity/ai :initform nil)))
 ```
 Here we've added 2 new slots to our entity, and initialized them to `nil`.  We'll also create an after-initialize method to make components more useful:
 
@@ -83,5 +83,33 @@ And now we can change our Player entity to include a fighter component, like so:
 
 We'll do the same for those monsters we've scattered around the map:
 ```lisp
+(defmethod place-entities ((map game-map) (room rect) entities max-enemies-per-room)
+  (let ((num-monsters (random max-enemies-per-room)))
+    (dotimes (monster-index num-monsters)
+      (multiple-value-bind (x y) (random_cell room)
+        (unless (entity-at entities x y)
+          (cond ((< (random 100) 80)
+                 (let* ((fighter-component (make-instance 'fighter :hp 10 :defense 0 :power 3))
+                        (ai-component (make-instance 'basic-monster))
+                        (orc (make-instance 'entity :name "Orc" :x x :y y :color  (blt:green) :char #\o :blocks t
+                                                    :fighter fighter-component :ai ai-component)))
+                   (nconc entities (list orc))))
 
+                (t
+                  (let* ((fighter-component (make-instance 'fighter :hp 16 :defense 1 :power 4))
+                         (ai-component (make-instance 'basic-monster))
+                         (troll (make-instance 'entity :name "Troll" :x x :y y :color  (blt:yellow) :char #\T :blocks t
+                                                       :fighter fighter-component :ai ai-component)))
+                    (nconc entities (list troll))))))))))
 ```
+
+Next up we'll modify our game-tick to call the AI routine on our monsters so they can do things:
+```lisp
+(when (eql game-state :enemy-turn)
+  (dolist (entity (remove-if-not #'entity/ai entities))
+    (take-turn (entity/ai entity)))
+```
+The new concept here is in `(dolist (entity (remove-if-not #'entity/ai entities))`.  Instead of letting `dolist` use our entire list of entities, we first run that list through a macro that gives us just the entities that have an `ai` set.
+
+If we run our game now, all the enemies complain about their lack of features:
+![Turnabout](../screenshots/part-6-2-turns.gif?raw=true "Is fair play")
