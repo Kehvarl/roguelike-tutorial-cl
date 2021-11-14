@@ -9,6 +9,7 @@ The key to our new goal is the Component.  A component is a feature that our ent
 ### New file
 We will start with creating a new file named `components.lisp`  Don't forget to `in-package` it and add it to our .asd
 
+### The Component class
 For starters we'll create a generic `component` class that our other components can inherit from, so we can give them some consistency:
 ```lisp
 (defclass component ()
@@ -16,6 +17,7 @@ For starters we'll create a generic `component` class that our other components 
 ```
 No new concepts here, but this is the core of our entire new composition system.
 
+### The Fighter Component: HP, Attack, and Defense
 Next up we will define the first component we'll actually use:
 ```lisp
 (defclass fighter (component)
@@ -25,6 +27,7 @@ Next up we will define the first component we'll actually use:
    (power :initarg :power :accessor fighter/power)))
 ```
 
+### The AI Component:  Do that voodoo that you do
 Let's also create a component to represent AI behavior and a take-turn method for it:
 ```Lisp
 (defclass basic-monster (component) ())
@@ -39,6 +42,7 @@ sudo apt uupdatesudo apt upgraded-array-element-typeps -ae
   (format t "The ~A wonders when it will get to move.~%" (entity/name (component/owner component))))
 ```
 
+### Using Components
 Let's set up our entity to handle components:
 ```lisp
 (defclass entity ()
@@ -113,3 +117,60 @@ The new concept here is in `(dolist (entity (remove-if-not #'entity/ai entities)
 
 If we run our game now, all the enemies complain about their lack of features:
 ![Turnabout](../screenshots/part-6-2-turns.gif?raw=true "Is fair play")
+
+## AI
+The `basic-monster` AI that we have now can take turns, but can't actually do anything yet.  Let's work on improving that.
+
+We will modify `basic-monster` to move towards the player and then attack.  First of all we need a function that will let us figure out how close we are to the player. Since this is used by an entity we'll make it a method in the Entity file:
+
+```lisp
+(defmethod distance-to ((e entity) (other entity))
+  (let ((dx (- (entity/x other) (entity/x e)))
+        (dy (- (entity/y other) (entity/y e))))
+    (sqrt (+ (expt dx 2) (expt dy 2)))))
+```
+
+Now that we have that tool, we will create a `move-towards` method on `basic-monster` so that it will move the entity towards a target location, moving in a straight line.  If it hits a wall it will stop.
+```lisp
+(defgeneric move-towards (e target-x target-y map entities))
+(defmethod move-towards ((e entity) target-x target-y map entities)
+  (with-slots (x y) e
+    (let* ((dx (- target-x x))
+           (dy (- target-y y))
+           (distance (sqrt (+ (expt dx 2) (expt dy 2)))))
+      (setf dx (round (/ dx distance))
+            dy (round (/ dy distance)))
+      (unless (or (blocked-p map (+ x dx) (+ y dy)))
+        (move e dx dy)))))
+```
+
+Fantastic!  We now have the ability to move towards a point, and the ability to determine the distance between two entities.  Let's use these and make `take-turn` more exciting:
+```lisp
+
+(defgeneric take-turn (component target map entities))
+(defmethod take-turn ((component basic-monster) target map entities)
+  (let* ((monster (component/owner component))
+         (in-sight (tile/visible (aref (game-map/tiles map) (entity/x monster) (entity/y monster)))))
+    (when in-sight
+      (cond ((>= (distance-to monster target) 2)
+             (move-towards monster (entity/x target) (entity/y target) map entities))
+            ((> (fighter/hp (entity/fighter target)) 0)
+             (format t "The ~A insults you! Your ego is damaged!~%" (entity/name (component/owner component))))))))
+
+```
+Obviously we've had to redefine our arguments, so we updated the generic first, then the actual method.
+On the method we're not exploring any new features, we're just performing a couple of simple checks:
+* If a monster is in the current Field of View, then the monster is allowed a turn
+* If the monster is 2 or more spaces from their target, they move towards that target in as close to a straight line as possible.
+* If the monster is next to the target, and the target still has HP, then the monster attacks (for now, just insults) the target.
+
+This is marvelous, but it won't work yet.  Let's fix our call to `take-turn` over in `game-tick`:
+```lisp
+(when (eql game-state :enemy-turn)
+  (dolist (entity (remove-if-not #'entity/ai entities))
+    (take-turn (entity/ai entity) player map entities))
+  (setf game-state :player-turn)))
+```
+
+Basically, we just try to move towards and attack the player.
+![I'm gonna find ya](../screenshots/part-6-4-stalking.gif?raw=true "I'm gonna getcha getcha getcha getcha")
