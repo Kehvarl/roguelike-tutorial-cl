@@ -14,3 +14,7 @@
 (defgeneric take-turn (component))
 (defmethod take-turn ((component basic-monster))
   (format t "The ~A wonders when it will get to move.~%" (entity/name (component/owner component))))
+
+(defgeneric move-towards (e target-x target-y map entities))
+(defmethod move-towards ((e entity) target-x target-y map entities)
+  (with-slots (x y) e))

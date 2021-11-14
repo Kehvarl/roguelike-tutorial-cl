@@ -31,3 +31,8 @@
       (setf (blt:background-color) (blt:cell-background-color x y)
             (blt:color) color
             (blt:cell-char x y) char))))
+
+(defmethod distance-to ((e entity) (other entity))
+  (let ((dx (- (entity/x other) (entity/x e)))
+        (dy (- (entity/y other) (entity/y e))))
+    (sqrt (+ (expt dx 2) (expt dy 2)))))
