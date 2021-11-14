@@ -131,3 +131,15 @@ We will modify `basic-monster` to move towards the player and then attack.  Firs
 ```
 
 Now that we have that tool, we will modify our `take-turn` method on `basic-monster` so that it will move the entity towards a target location, moving in a straight line.  If it hits a wall it will stop.
+```lisp
+(defgeneric move-towards (e target-x target-y map entities))
+(defmethod move-towards ((e entity) target-x target-y map entities)
+  (with-slots (x y) e
+    (let* ((dx (- target-x x))
+           (dy (- targey-y y))
+           (distance (sqrt (+ (expt dx 2) (expt dy 2)))))
+      (setf dx (round (/ dx distance))
+            dy (round (/ dy distance)))
+      (unless (or (blocked-p map (+ x dx) (+ y dy)))
+        (move e dx dy)))))
+```

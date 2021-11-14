@@ -17,4 +17,11 @@
 
 (defgeneric move-towards (e target-x target-y map entities))
 (defmethod move-towards ((e entity) target-x target-y map entities)
-  (with-slots (x y) e))
+  (with-slots (x y) e
+    (let* ((dx (- target-x x))
+           (dy (- targey-y y))
+           (distance (sqrt (+ (expt dx 2) (expt dy 2)))))
+      (setf dx (round (/ dx distance))
+            dy (round (/ dy distance)))
+      (unless (or (blocked-p map (+ x dx) (+ y dy)))
+        (move e dx dy)))))
