@@ -130,16 +130,47 @@ We will modify `basic-monster` to move towards the player and then attack.  Firs
     (sqrt (+ (expt dx 2) (expt dy 2)))))
 ```
 
-Now that we have that tool, we will modify our `take-turn` method on `basic-monster` so that it will move the entity towards a target location, moving in a straight line.  If it hits a wall it will stop.
+Now that we have that tool, we will create a `move-towards` method on `basic-monster` so that it will move the entity towards a target location, moving in a straight line.  If it hits a wall it will stop.
 ```lisp
 (defgeneric move-towards (e target-x target-y map entities))
 (defmethod move-towards ((e entity) target-x target-y map entities)
   (with-slots (x y) e
     (let* ((dx (- target-x x))
-           (dy (- targey-y y))
+           (dy (- target-y y))
            (distance (sqrt (+ (expt dx 2) (expt dy 2)))))
       (setf dx (round (/ dx distance))
             dy (round (/ dy distance)))
       (unless (or (blocked-p map (+ x dx) (+ y dy)))
         (move e dx dy)))))
 ```
+
+Fantastic!  We now have the ability to move towards a point, and the ability to determine the distance between two entities.  Let's use these and make `take-turn` more exciting:
+```lisp
+
+(defgeneric take-turn (component target map entities))
+(defmethod take-turn ((component basic-monster) target map entities)
+  (let* ((monster (component/owner component))
+         (in-sight (tile/visible (aref (game-map/tiles map) (entity/x monster) (entity/y monster)))))
+    (when in-sight
+      (cond ((>= (distance-to monster target) 2)
+             (move-towards monster (entity/x target) (entity/y target) map entities))
+            ((> (fighter/hp (entity/fighter target)) 0)
+             (format t "The ~A insults you! Your ego is damaged!~%" (entity/name (component/owner component))))))))
+
+```
+Obviously we've had to redefine our arguments, so we updated the generic first, then the actual method.
+On the method we're not exploring any new features, we're just performing a couple of simple checks:
+* If a monster is in the current Field of View, then the monster is allowed a turn
+* If the monster is 2 or more spaces from their target, they move towards that target in as close to a straight line as possible.
+* If the monster is next to the target, and the target still has HP, then the monster attacks (for now, just insults) the target.
+
+This is marvelous, but it won't work yet.  Let's fix our call to `take-turn` over in `game-tick`:
+```lisp
+(when (eql game-state :enemy-turn)
+  (dolist (entity (remove-if-not #'entity/ai entities))
+    (take-turn (entity/ai entity) player map entities))
+  (setf game-state :player-turn)))
+```
+
+Basically, we just try to move towards and attack the player.
+![I'm gonna find ya](../screenshots/part-6-4-stalking.gif?raw=true "I'm gonna getcha getcha getcha getcha")

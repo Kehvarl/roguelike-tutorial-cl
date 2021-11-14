@@ -95,7 +95,7 @@
 
     (when (eql game-state :enemy-turn)
       (dolist (entity (remove-if-not #'entity/ai entities))
-        (take-turn (entity/ai entity)))
+        (take-turn (entity/ai entity) player map entities))
       (setf game-state :player-turn)))
 
   game-state)
