@@ -57,15 +57,19 @@
 
 ;; Simple keyboard-input handler.
 (defun handle-keys ()
-  (let ((action nil))
+  (when (blt:has-input-p)
     (blt:key-case (blt:read)
-                  (:up (setf action (list :move (cons 0 -1))))
-                  (:down (setf action (list :move (cons 0 1))))
-                  (:left (setf action (list :move (cons -1 0))))
-                  (:right (setf action (list :move (cons 1 0))))
-                  (:escape (setf action (list :quit t)))
-                  (:close (setf action (list :quit t))))
-    action))
+                  ((or :up :w) (list :move (cons 0 -1)))
+                  ((or :down :s) (list :move (cons 0 1)))
+                  ((or :left :a) (list :move (cons -1 0)))
+                  ((or :right :d) (list :move (cons 1 0)))
+                  (:q (list :move (cons -1 -1)))
+                  (:e (list :move (cons 1 -1)))
+                  (:z (list :move (cons -1 1)))
+                  (:c (list :move (cons 1 1)))
+                  (:escape (list :quit t))
+                  (:close (list :quit t)))))
+
 
 ;;The game-tick handles each turn:
 ;; Render the map

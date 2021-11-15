@@ -174,3 +174,73 @@ This is marvelous, but it won't work yet.  Let's fix our call to `take-turn` ove
 
 Basically, we just try to move towards and attack the player.
 ![I'm gonna find ya](../screenshots/part-6-4-stalking.gif?raw=true "I'm gonna getcha getcha getcha getcha")
+
+### Movement
+Currently the player can move in the 4 orthogonal directions, while the monsters can move in all 8 directions including the diagonals.  There are three ways we could resolve this:
+* Restrict the monsters to the cardinal directions.
+* Allow the player to move in all 8 directions.
+* Leave it as is with a bit of unfairness in the monster's favor.
+
+In order to maximize flexibility, we'll go with option B: allow the player to move in any direction. If we look into our `handle-keys` function, we can simply add some more keys to allow diagonals.  
+
+It's popular to use the "Vim" keys for this:
+```
+     ^
+ \   |   /
+   y k u
+<- h   l ->
+   b j n
+ /  |  \
+    v
+```
+
+Unfortunately, I find this to be awkward and uncomfortable on my specific keyboard.  We could use the tenkey/number-pad, but a lot of people use tenkeyless keyboards or laptops.  
+
+For me, I've found it easier to expand the well-known WASD keys for movement:
+```
+     ^
+ \   |   /
+   q w e
+<- a   d ->
+   z s c
+ /  |  \
+    v
+```
+
+If you find this doesn't work for you, feel free to experiment with options that feel comfortable and fast!
+
+Before we add the diagonals, let's make a change to how `handle-keys` works.  
+```lisp
+(defun handle-keys ()
+  (when (blt:has-input-p)
+    (blt:key-case (blt:read)
+                  ((or :up :w) (list :move (cons 0 -1)))
+                  ((or :down :s) (list :move (cons 0 1)))
+                  ((or :left :a) (list :move (cons -1 0)))
+                  ((or :right :d) (list :move (cons 1 0)))
+                  (:escape (list :quit t))
+                  (:close (list :quit t)))))
+```
+This has a few changes:
+* When we first enter the function we check to see if there's any input.  If not, jump back out.  This allows the game do do stuff instead of freezing and waiting for input.
+* Instead of setting and returning an `action` variable, we just immediately return the action to perform.  This isn't essential, but it does clean things up a little.
+* While we were at it, we added WASD movement.
+
+Now we'll add diagonals:
+```lisp
+(defun handle-keys ()
+  (when (blt:has-input-p)
+    (blt:key-case (blt:read)
+                  ((or :up :w) (list :move (cons 0 -1)))
+                  ((or :down :s) (list :move (cons 0 1)))
+                  ((or :left :a) (list :move (cons -1 0)))
+                  ((or :right :d) (list :move (cons 1 0)))
+                  (:q (list :move (cons -1 -1)))
+                  (:e (list :move (cons 1 -1)))
+                  (:z (list :move (cons -1 1)))
+                  (:c (list :move (cons 1 1)))
+                  (:escape (list :quit t))
+                  (:close (list :quit t)))))
+```
+The actual key implementation is pretty straightforward here.
+![The Oblique Approach](../screenshots/part-6-6-diagonal.gif?raw=true "Unnatural movements")
