@@ -243,3 +243,4 @@ Now we'll add diagonals:
                   (:close (list :quit t)))))
 ```
 The actual key implementation is pretty straightforward here.
+![The Oblique Approach](../screenshots/part-6-6-diagonal.gif?raw=true "Unnatural movements")
