@@ -1,4 +1,4 @@
-#Part 6 - Doing (and taking) some damage
+# Part 6 - Doing (and taking) some damage
 So far we have created a window, figured out how to draw on it, created a random map, created a generic entity type which we can place anywhere on the map, and added turns for the player and the other entities.
 
 Now we will add some interaction by making it possible to attack those other entities and do some damage to them (and eventually allowing those monsters to do damage right back and move around on their own).
