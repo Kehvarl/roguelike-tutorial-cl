@@ -228,5 +228,18 @@ This has a few changes:
 
 Now we'll add diagonals:
 ```lisp
-
+(defun handle-keys ()
+  (when (blt:has-input-p)
+    (blt:key-case (blt:read)
+                  ((or :up :w) (list :move (cons 0 -1)))
+                  ((or :down :s) (list :move (cons 0 1)))
+                  ((or :left :a) (list :move (cons -1 0)))
+                  ((or :right :d) (list :move (cons 1 0)))
+                  (:q (list :move (cons -1 -1)))
+                  (:e (list :move (cons 1 -1)))
+                  (:z (list :move (cons -1 1)))
+                  (:c (list :move (cons 1 1)))
+                  (:escape (list :quit t))
+                  (:close (list :quit t)))))
 ```
+The actual key implementation is pretty straightforward here.
