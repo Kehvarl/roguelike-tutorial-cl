@@ -255,4 +255,4 @@ Some reference material on A* pathfinding:
 * [A* implementation guide (Red Blob Games)](https://www.redblobgames.com/pathfinding/a-star/implementation.html)
 * [Easy A* Pathfinding (Nicholas Swift)](https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2)
 
-If you've taken the chance to look over those resources, or you're familiar with A* already, or you just want to get on with it, let's get to coding!
+If you've taken the chance to look over those resources, or you're familiar with A* already, or you just want to get on with it: let's get to coding!
