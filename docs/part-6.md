@@ -244,3 +244,15 @@ Now we'll add diagonals:
 ```
 The actual key implementation is pretty straightforward here.
 ![The Oblique Approach](../screenshots/part-6-6-diagonal.gif?raw=true "Unnatural movements")
+
+## Pathfinding
+The way our monsters move isn't very helpful. In fact, they can easily be trapped against walls and allow the player to escape.
+
+To improve our AI we will upgrade how it determines what the next direction to move will be, a process know as "pathfinding".  There are actually several pathfinding algorithms we can use, but A* (A-Star) is very popular for these sorts of games because it determines a pretty effective path to the target.
+
+Some reference material on A* pathfinding:
+* [Introduction to A* (Red Blob Games)](https://www.redblobgames.com/pathfinding/a-star/introduction.html)
+* [A* implementation guide (Red Blob Games)](https://www.redblobgames.com/pathfinding/a-star/implementation.html)
+* [Easy A* Pathfinding (Nicholas Swift)](https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2)
+
+If you've taken the chance to look over those resources, or you're familiar with A* already, or you just want to get on with it: let's get to coding!
