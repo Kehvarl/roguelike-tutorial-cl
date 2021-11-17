@@ -282,6 +282,21 @@ Pathfinding will take a bit of space, so let's put it into its own file right fr
 ```
 
 `pathfinding.lisp`:
-```
+
+```lisp
 (in-package #:roguelike-tutorial-cl)
+```
+
+Our implementation will need to know what directions might be valid, so we'll create a parameter to hold that for us.   If we wanted to restrict our AI to only be allowed to move orthogonally we'd just leave off the diagonals in this list:
+
+```lisp
+(defparameter *all-ditections*
+  (list (cons 0 -1)
+        (cons 0 1)
+        (cons -1 0)
+        (cons 1 0)
+        (cons -1 -1)
+        (cons -1 1)
+        (cons 1 -1)
+        (cons 1 1)))
 ```
