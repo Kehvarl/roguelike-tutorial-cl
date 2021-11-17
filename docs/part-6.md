@@ -313,4 +313,11 @@ Next up we'll create the basic class that A* uses:  The Node.  A node tracks a f
 That's enough to create our `node` class, so let's do that!
 ```Lisp
 
+(defclass node ()
+  ((g :initform 0 :accessor node/g)
+   (h :initform 0 :accessor node/h)
+   (f :initform 0 :accessor node/f)
+   (distance-from-parent :initarg :distance-from-parent :accessor node/distance-from-parent)
+   (parent :initarg :parent :initform nil :accessor node/parent)
+   (position :initarg :position :initform nil :accessor node/position)))
 ```
