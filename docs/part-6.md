@@ -267,3 +267,50 @@ And so we can use it starting right away, let's load the system in our REPL:
 (ql:quickload :queues.priority-queue)
 ```
 ![Queuing up](../screenshots/part-6-7-repl.png?raw=true "Walk the line")
+
+### A whole new file
+Pathfinding will take a bit of space, so let's put it into its own file right from the start.  Create a new file named `pathfinding.lisp` and add it to your package.  Don't forget to put it into your `.asd` file as well:
+`.asd` includes:
+```Lisp
+:components ((:file "package")
+             (:file "game-map")
+             (:file "pathfinding")
+             (:file "entity")
+             (:file "components")
+             (:file "fov")
+             (:file "roguelike-tutorial-cl")))
+```
+
+`pathfinding.lisp`:
+
+```lisp
+(in-package #:roguelike-tutorial-cl)
+```
+
+Our implementation will need to know what directions might be valid, so we'll create a parameter to hold that for us.   If we wanted to restrict our AI to only be allowed to move orthogonally we'd just leave off the diagonals in this list:
+
+```lisp
+(defparameter *all-ditections*
+  (list (cons 0 -1)
+        (cons 0 1)
+        (cons -1 0)
+        (cons 1 0)
+        (cons -1 -1)
+        (cons -1 1)
+        (cons 1 -1)
+        (cons 1 1)))
+```
+
+Next up we'll create the basic class that A* uses:  The Node.  A node tracks a few pieces of information:
+* g: The distance from the current node to the start node
+* h: The estimated distance from the current node to the end node (Heuristic)
+  * calculated as the total change in x (squared), plus the total change in y (squared), from this cell to the goal:  `h = dx*dx + dy*dy`
+* f: The total cost of the node.  `g + h`
+* distance-from-parent: How many moves are requured to reach this node from the parent node
+* parent: A reference to the parent node
+* position: The node's X/Y location on the map
+
+That's enough to create our `node` class, so let's do that!
+```Lisp
+
+```
