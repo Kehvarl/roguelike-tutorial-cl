@@ -256,3 +256,14 @@ Some reference material on A* pathfinding:
 * [Easy A* Pathfinding (Nicholas Swift)](https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2)
 
 If you've taken the chance to look over those resources, or you're familiar with A* already, or you just want to get on with it: let's get to coding!
+
+### New dependencies
+We could implement A* using just Lisp primitives, but why make our life too much harder than we need to?   We'll use a priority queue, and so we will add a dependency to a library that gives us those.  We'll open up our `.asd` file and update the `:depends-on` line like so:
+```lisp
+:depends-on (#:cl-blt #:queues.priority-queue)
+```
+And so we can use it starting right away, let's load the system in our REPL:
+```Lisp
+(ql:quickload :queues.priority-queue)
+```
+![Queuing up](../screenshots/part-6-7-repl.png?raw=true "Walk the line")
