@@ -267,3 +267,21 @@ And so we can use it starting right away, let's load the system in our REPL:
 (ql:quickload :queues.priority-queue)
 ```
 ![Queuing up](../screenshots/part-6-7-repl.png?raw=true "Walk the line")
+
+### A whole new file
+Pathfinding will take a bit of space, so let's put it into its own file right from the start.  Create a new file named `pathfinding.lisp` and add it to your package.  Don't forget to put it into your `.asd` file as well:
+`.asd` includes:
+```Lisp
+:components ((:file "package")
+             (:file "game-map")
+             (:file "pathfinding")
+             (:file "entity")
+             (:file "components")
+             (:file "fov")
+             (:file "roguelike-tutorial-cl")))
+```
+
+`pathfinding.lisp`:
+```
+(in-package #:roguelike-tutorial-cl)
+```
