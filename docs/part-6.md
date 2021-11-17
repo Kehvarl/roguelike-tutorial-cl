@@ -300,3 +300,17 @@ Our implementation will need to know what directions might be valid, so we'll cr
         (cons 1 -1)
         (cons 1 1)))
 ```
+
+Next up we'll create the basic class that A* uses:  The Node.  A node tracks a few pieces of information:
+* g: The distance from the current node to the start node
+* h: The estimated distance from the current node to the end node (Heuristic)
+  * calculated as the total change in x (squared), plus the total change in y (squared), from this cell to the goal:  `h = dx*dx + dy*dy`
+* f: The total cost of the node.  `g + h`
+* distance-from-parent: How many moves are requured to reach this node from the parent node
+* parent: A reference to the parent node
+* position: The node's X/Y location on the map
+
+That's enough to create our `node` class, so let's do that!
+```Lisp
+
+```
