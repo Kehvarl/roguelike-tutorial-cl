@@ -1,8 +1,10 @@
 # roguelike-tutorial-cl
 Start implementing a Common Lisp tutorial for the Roguelike Tutorial
 Based on and influenced by these projects:
-  * http://rogueliketutorials.com/tutorials/tcod/v2/
   * https://nwforrer.github.io/categories/roguelike-tutorial/
+  * http://rogueliketutorials.com/tutorials/tcod/v2/
+
+The code segments and final product are nearly exact copies of the work done by NWForrer, and I strongly recommend checking that project if at any time this tutorial results in a broken project.
 
 # Tutorial Chapters
 * ![Part 0 - Setting Up](./docs/part-0.md)
