@@ -321,3 +321,15 @@ That's enough to create our `node` class, so let's do that!
    (parent :initarg :parent :initform nil :accessor node/parent)
    (position :initarg :position :initform nil :accessor node/position)))
 ```
+
+### Node Methods
+Our new class can store data that will be very useful for our implementation, but we can benefit from some tools:
+* print-object - A method to nicely print our Node objects in case we need to do some debugging.
+* node-equal - Compares two nodes to determine if they have the same position
+* node-compare - Return T if n1 has a lower `F` slot value than n2
+* find-in-queue - scan through a queue and find the last node with the same position as the given node.
+
+
+```lisp
+
+```

@@ -17,3 +17,8 @@
    (distance-from-parent :initarg :distance-from-parent :accessor node/distance-from-parent)
    (parent :initarg :parent :initform nil :accessor node/parent)
    (position :initarg :position :initform nil :accessor node/position)))
+
+(defmethod print-object ((obj node) stream)
+  (print-unreadable-object (obj stream :type t)
+    (with-slots (position parent) obj
+      (format stream "~A, parent ~A" position parent))))
