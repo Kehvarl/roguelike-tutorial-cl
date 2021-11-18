@@ -28,3 +28,11 @@
 
 (defmethod node-compare ((n1 node) n2)
   (< (node/f n1) (node/f n2)))
+
+(defun find-in-queue (queue n)
+  (let ((node nil))
+    (queue:map-queue #'(lambda (item)
+                         (when (node-equal n item)
+                           (setf node item)))
+                     queue)
+    node))
