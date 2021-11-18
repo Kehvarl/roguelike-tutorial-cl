@@ -22,3 +22,6 @@
   (print-unreadable-object (obj stream :type t)
     (with-slots (position parent) obj
       (format stream "~A, parent ~A" position parent))))
+
+(defmethod node-equal ((n1 node) n2)
+ (equal (node/position n1) (node/position n2)))
