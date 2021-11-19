@@ -331,5 +331,26 @@ Our new class can store data that will be very useful for our implementation, bu
 
 
 ```lisp
+(defmethod print-object ((obj node) stream)
+  (print-unreadable-object (obj stream :type t)
+    (with-slots (position parent) obj
+      (format stream "~A, parent ~A" position parent))))
 
+(defmethod node-equal ((n1 node) n2)
+  "Return T if N1 and N2 have the same POSITION"
+ (equal (node/position n1) (node/position n2)))
+
+(defmethod node-compare ((n1 node) n2)
+  "Return T if N1's F slot is less than N2's F slot"
+  (< (node/f n1) (node/f n2)))
+
+(defun find-in-queue (queue n)
+  "Find the node N in the QUEUE by it's position.  If there are multiple
+  nodes with the same position, return the LAST matching node."
+  (let ((node nil))
+    (queue:map-queue #'(lambda (item)
+                         (when (node-equal n item)
+                           (setf node item)))
+                     queue)
+    node))
 ```
