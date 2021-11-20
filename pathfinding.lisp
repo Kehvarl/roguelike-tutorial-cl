@@ -35,8 +35,25 @@
   "Find the node N in the QUEUE by it's position.  If there are multiple
   nodes with the same position, return the LAST matching node."
   (let ((node nil))
-    (queue:map-queue #'(lambda (item)
-                         (when (node-equal n item)
-                           (setf node item)))
+    (queues:map-queue #'(lambda (item)
+                          (when (node-equal n item)
+                            (setf node item)))
                      queue)
     node))
+
+(defun create-path (current-node)
+  "Given a node, return a list of all parent nodes leading to it."
+  (do ((path nil)
+       (current current-node (node/parent current)))
+      ((null current) (reverse path))
+    (setf path (append path (list (node/position current))))))
+
+(defun make-node (parent-node node-x node-y direction-from-parent)
+  "Creates a NODE instance with a given PARENT, X, Y, and calculated DISTANCE-FROM-PARENT."
+  (let ((distance 10))
+    (if (and (not (zerop (car direction-from-parent)))
+             (not (zerop (cdr direction-from-parent))))
+      (setf distance 14))
+    (make-instance 'node :parent parent-node
+                         :position (cons node-x node-y)
+                         :distance-from-parent distance)))
