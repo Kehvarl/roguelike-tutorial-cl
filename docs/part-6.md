@@ -373,4 +373,11 @@ Now we will set up a few methods that our A* implementation will use to determin
     (make-instance 'node :parent parent-node
                          :position (cons node-x node-y)
                          :distance-from-parent distance)))    
+
+(defun generate-node-cost (child current-node end-node)
+  (with-slots (g h f position distance-from-parent) child
+    (setf g (+ distance-from-parent (node/g current-node))
+          h (+ (expt (- (car position) (car (node/position end-node))) 2)
+               (expt (- (cdr position) (cdr (node/position end-node))) 2))
+          f (+ g h))))
 ```
