@@ -65,3 +65,15 @@
           h (+ (expt (- (car position) (car (node/position end-node))) 2)
                (expt (- (cdr position) (cdr (node/position end-node))) 2))
           f (+ g h))))
+
+(defun update-open-queue (open-list child-node)
+  "Updates an existing entry in OPEN-LIST if one exists that both matches
+   CHILD-NODE and has a larger G value.  If there is no existing entry that
+   matches CHILD-NODE then push the CHILD-NODE onto OPEN-LIST"
+  (let ((existing-child (find-in-queue open-list child-node)))
+    (cond ((and existing-child (< (node/g child-node) (node/g existing-child)))
+           (queues:queue-change open-list
+                                (queues:queue-find open-list existing-child)
+                                child-node))
+          (t
+            (queues:qpush open-list child-node)))))
