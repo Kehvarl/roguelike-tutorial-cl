@@ -380,4 +380,13 @@ Now we will set up a few methods that our A* implementation will use to determin
           h (+ (expt (- (car position) (car (node/position end-node))) 2)
                (expt (- (cdr position) (cdr (node/position end-node))) 2))
           f (+ g h))))
+
+(defun update-open-queue (open-list child-node)
+  (let ((existing-child (find-in-queue open-list child-node)))
+    (cond ((and existing-child (< (node/g child-node) (node/g existing-child)))
+           (queues:queue-change open-list
+                                (queues:queue-find open-list existing-child)
+                                child-node))
+          (t
+            (queues:qpush open-list child-node)))))
 ```
