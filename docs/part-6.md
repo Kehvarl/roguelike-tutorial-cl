@@ -290,7 +290,7 @@ Pathfinding will take a bit of space, so let's put it into its own file right fr
 Our implementation will need to know what directions might be valid, so we'll create a parameter to hold that for us.   If we wanted to restrict our AI to only be allowed to move orthogonally we'd just leave off the diagonals in this list:
 
 ```lisp
-(defparameter *all-ditections*
+(defparameter *all-directions*
   (list (cons 0 -1)
         (cons 0 1)
         (cons -1 0)
@@ -389,4 +389,20 @@ Now we will set up a few methods that our A* implementation will use to determin
                                 child-node))
           (t
             (queues:qpush open-list child-node)))))
+
+(defun generate-node-children (current-node map open-list closed-list end-node)
+  (dolist (new-position *all-directions*)
+    (let ((node-x (+ (car (node/position current-node))
+                     (car new-position)))
+          (node-y (+ (cdr (node/position current-node))
+                     (cdr new-position))))
+      (unless (or (> node-x (1- (game-map/w map)))
+                  (< node-x 0)
+                  (> node-y (1- (game-map/h map)))
+                  (< node-y 0))
+        (unless (tile/blocked (aref (game-map/tiles map) node-x node-y))
+          (let ((child (make-node current-node node-x node-y new-position)))
+            (unless (find child closed-list :test 'node-equal)
+              (generate-node-cost child current-node end-node)
+              (update-open-queue open-list child))))))))
 ```
