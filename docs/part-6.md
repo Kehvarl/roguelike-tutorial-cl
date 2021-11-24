@@ -406,3 +406,22 @@ Now we will set up a few methods that our A* implementation will use to determin
               (generate-node-cost child current-node end-node)
               (update-open-queue open-list child))))))))
 ```
+
+Now that we have the necessary tools, let's implement A* itself.   
+```lisp
+(defun astar (map start end)
+  (let ((start-node (make-instance 'node :position start))
+        (end-node (make-instance 'node :position end))
+        (open-list (queues:make-queue :priority-queue :compare #'node-compare))
+        (closed-list nil))
+    (queues:qpush open-list start-node)
+    (do ((current-node (queues:qpop open-list) (queues:qpop open-list)))
+        ((null current-node))
+      (setf closed-list (append closed-list (list current-node)))
+
+      ;;Found the Goal
+      (when (node-equal current-node end-node)
+        (return from astar (create-path current-node)))
+
+      (generate-node-children current-node map open-list closed-list end-node))))
+```
