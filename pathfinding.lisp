@@ -96,3 +96,21 @@
             (unless (find child closed-list :test 'node-equal)
               (generate-node-cost child current-node end-node)
               (update-open-queue open-list child))))))))
+
+(defun astar (map start end)
+  "Returns a list of cons cells representing a path from the given START to the
+   given END"
+  (let ((start-node (make-instance 'node :position start))
+        (end-node (make-instance 'node :position end))
+        (open-list (queues:make-queue :priority-queue :compare #'node-compare))
+        (closed-list nil))
+    (queues:qpush open-list start-node)
+    (do ((current-node (queues:qpop open-list) (queues:qpop open-list)))
+        ((null current-node))
+      (setf closed-list (append closed-list (list current-node)))
+
+      ;;Found the Goal
+      (when (node-equal current-node end-node)
+        (return from astar (create-path current-node)))
+
+      (generate-node-children current-node map open-list closed-list end-node))))
