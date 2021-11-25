@@ -421,7 +421,23 @@ Now that we have the necessary tools, let's implement A* itself.
 
       ;;Found the Goal
       (when (node-equal current-node end-node)
-        (return from astar (create-path current-node)))
+        (return-from astar (create-path current-node)))
 
       (generate-node-children current-node map open-list closed-list end-node))))
 ```
+
+Having built ourselves a series of routines that implement A* navigation, we can update the `move-towards` method to use that instead of the current naive solution.  This will make the monsters much more dangerous.  So over in our `components` file:
+
+```Lisp
+(defmethod move-towards ((e entity) target-x target-y map entities)
+  (with-slots (x y) e
+    (let ((path (astar map (cons x y) (cons target-x target-y))))
+      (when path
+        (let ((next-location (nth 1 path)))
+          (unless (blocking-entity-at entities (car next-location) (cdr next-location))
+            (move e (- (car next-location) x) (- (cdr next-location) y))))))))
+```
+
+If we make sure everything is compiled, and run our game, the monsters now move much more intelligently:
+
+![Welcome to the society](../screenshots/part-6-8-pathfinder.gif?raw=true "There can be no escape.")
