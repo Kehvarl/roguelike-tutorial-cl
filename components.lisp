@@ -9,6 +9,25 @@
    (defense :initarg :defense :accessor fighter/defense)
    (power :initarg :power :accessor fighter/power)))
 
+(defgeneric take-damage (component amount))
+(defmethod take-damage ((component fighter) amount)
+  (decf (fighter/hp component) amount))
+
+(defgeneric attack (component target))
+(defmethod attack ((component fighter) (target entity))
+  (let ((damage (- (fighter/power component) (fighter/defense (entity/fighter target)))))
+    (cond
+      ((> damage 0)
+       (take-damage (entity/fighter target) damage)
+       (format t "~A attackt ~A, and deals ~A point in damage.~%"
+               (entity/name (component/owner component))
+               (entity/name target)
+               damage))
+      (t
+       (format t "~A attackt ~A, but does no damage.~%"
+               (entity/name (component/owner component))
+               (entity/name target))))))
+
 (defclass basic-monster (component) ())
 
 (defgeneric take-turn (component target map entities))
@@ -19,7 +38,7 @@
       (cond ((>= (distance-to monster target) 2)
              (move-towards monster (entity/x target) (entity/y target) map entities))
             ((> (fighter/hp (entity/fighter target)) 0)
-             (format t "The ~A insults you! Your ego is damaged!~%" (entity/name (component/owner component))))))))
+             (attack (entity/fighter monster) target))))))
 
 (defgeneric move-towards (e target-x target-y map entities))
 (defmethod move-towards ((e entity) target-x target-y map entities)
