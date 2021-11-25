@@ -441,3 +441,20 @@ Having built ourselves a series of routines that implement A* navigation, we can
 If we make sure everything is compiled, and run our game, the monsters now move much more intelligently:
 
 ![Welcome to the society](../screenshots/part-6-8-pathfinder.gif?raw=true "There can be no escape.")
+
+## Combat
+We have improved our movement options.  We have made our monsters smarter.  Now: let's get dangerous!
+
+We'll start by adding some methods to our `fighter` class over in `components`.
+
+```Lisp
+(defgeneric take-damage (component amount))
+
+(defmethod take-damage ((component fighter) amount)
+  (decf (fighter/hp component) amount))
+```
+This simple method means we just tell the `fighter` class to take some damage and it does the appropriate subtraction for us.
+
+```Lisp
+```
+Here we make the act of attack and defense fully encapsulated within `fighter` as well.   No need for our game loop to do the work for us, we just pass in some values and get a result we can use to keep the player updated on what's happening.

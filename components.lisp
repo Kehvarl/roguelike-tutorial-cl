@@ -9,6 +9,10 @@
    (defense :initarg :defense :accessor fighter/defense)
    (power :initarg :power :accessor fighter/power)))
 
+(defgeneric take-damage (component amount))
+(defmethod take-damage ((component fighter) amount)
+  (decf (fighter/hp component) amount))
+
 (defclass basic-monster (component) ())
 
 (defgeneric take-turn (component target map entities))
