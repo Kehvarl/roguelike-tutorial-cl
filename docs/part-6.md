@@ -445,6 +445,7 @@ If we make sure everything is compiled, and run our game, the monsters now move 
 ## Combat
 We have improved our movement options.  We have made our monsters smarter.  Now: let's get dangerous!
 
+### The tools
 We'll start by adding some methods to our `fighter` class over in `components`.
 
 ```Lisp
@@ -472,3 +473,38 @@ This simple method means we just tell the `fighter` class to take some damage an
                (entity/name target))))))
 ```
 Here we make the act of attack and defense fully encapsulated within `fighter` as well.   No need for our game loop to do the work for us, we just pass in some values and get a result we can use to keep the player updated on what's happening.
+
+### Playing with our new toys
+Now that our `fighter` component can handle attack, defense, and damage; we can replace those place-holder messages which hurt our feelings and turn us into bullies with actual combat.   
+
+First, over in our main file's `game-tick` we update the player-move to handle the case where we would run into a monster:
+```Lisp
+...
+(unless (blocked-p map destination-x destination-y)
+  (let ((target (blocking-entity-at entities destination-x destination-y)))
+    (cond (target
+           (attack (entity/fighter player) target))
+          (t
+           (move player (car move) (cdr move))
+           (fov map (entity/x player) (entity/y player))))
+    (setf game-state :enemy-turn)))))
+...
+```
+
+Next we hop back to `components` and update `take-turn` to change what happens when a monster bumps into the Player:
+
+```Lisp
+(defmethod take-turn ((component basic-monster) target map entities)
+  (let* ((monster (component/owner component))
+         (in-sight (tile/visible (aref (game-map/tiles map) (entity/x monster) (entity/y monster)))))
+    (when in-sight
+      (cond ((>= (distance-to monster target) 2)
+             (move-towards monster (entity/x target) (entity/y target) map entities))
+            ((> (fighter/hp (entity/fighter target)) 0)
+             (attack (entity/fighter monster) target))))))
+```
+
+As you can see: in both places we simple replaced our placeholder message with a call to `attack` with the appropriate arguments.
+
+We can run our game now and witness the carnage:
+![Scenes of horror](../screenshots/part-6-10-senseless-violence.gif?raw=true "Locked in combat until the end of time.")

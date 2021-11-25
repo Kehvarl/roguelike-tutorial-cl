@@ -38,7 +38,7 @@
       (cond ((>= (distance-to monster target) 2)
              (move-towards monster (entity/x target) (entity/y target) map entities))
             ((> (fighter/hp (entity/fighter target)) 0)
-             (format t "The ~A insults you! Your ego is damaged!~%" (entity/name (component/owner component))))))))
+             (attack (entity/fighter monster) target))))))
 
 (defgeneric move-towards (e target-x target-y map entities))
 (defmethod move-towards ((e entity) target-x target-y map entities)
