@@ -456,5 +456,19 @@ We'll start by adding some methods to our `fighter` class over in `components`.
 This simple method means we just tell the `fighter` class to take some damage and it does the appropriate subtraction for us.
 
 ```Lisp
+(defgeneric attack (component target))
+(defmethod attack ((component fighter) (target entity))
+  (let ((damage (- (fighter/power component) (fighter/defense (entity/fighter target)))))
+    (cond
+      ((> damage 0)
+       (take-damage (entity/fighter target) damage)
+       (format t "~A attackt ~A, and deals ~A point in damage.~%"
+               (entity/name (component/owner component))
+               (entity/name target)
+               damage))
+      (t
+       (format t "~A attackt ~A, but does no damage.~%"
+               (entity/name (component/owner component))
+               (entity/name target))))))
 ```
 Here we make the act of attack and defense fully encapsulated within `fighter` as well.   No need for our game loop to do the work for us, we just pass in some values and get a result we can use to keep the player updated on what's happening.
