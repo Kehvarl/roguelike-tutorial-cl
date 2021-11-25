@@ -111,6 +111,6 @@
 
       ;;Found the Goal
       (when (node-equal current-node end-node)
-        (return from astar (create-path current-node)))
+        (return-from astar (create-path current-node)))
 
       (generate-node-children current-node map open-list closed-list end-node))))
