@@ -555,3 +555,20 @@ Once we calculate the results of an attack, there are two possible outcomes:
   * A list that contains the keyword `:message` and a pre-formatted string to indicate the results of the attack
   * The results of calling `take-damage` on the target with the amount of damage to deal.
 * A list containing the keyword `:message` and a pre-formatted string indicating that no damage was dealt to the target.
+
+Our `take-turn` method on the `basic-monster` component uses the `attack` method, so let's update it to pass those messages back to the main loop.
+
+`take-turn`:
+```Lisp
+(defmethod take-turn ((component basic-monster) target map entities)
+  (let* ((results nil)
+         (monster (component/owner component))
+         (in-sight (tile/visible (aref (game-map/tiles map) (entity/x monster) (entity/y monster)))))
+    (when in-sight
+      (cond ((>= (distance-to monster target) 2)
+             (move-towards monster (entity/x target) (entity/y target) map entities))
+            ((> (fighter/hp (entity/fighter target)) 0)
+             (setf results (attack (entity/fighter monster) target)))))
+    results))
+```
+Just 3 modifications here: add a `results` variable to our `let`, change the attack call to store its output in that `results` variable, and return `results` for later use.
