@@ -508,3 +508,11 @@ As you can see: in both places we simple replaced our placeholder message with a
 
 We can run our game now and witness the carnage:
 ![Scenes of horror](../screenshots/part-6-10-senseless-violence.gif?raw=true "Locked in combat until the end of time.")
+
+## Messages, Death, and Corpses
+We've built a lot of pieces:  maps, entities, a component system, field-of-view, exploration, advanced pathfinding, and some rudimentary combat.  We have just a few more really core pieces remaining that will make it easier for us to work with game messages and the results of combat.
+
+### Messages
+The first thing we're going to implement is a message system.  This will come in handy later when we want a more useful in-game log.
+
+Fortunately, we don't need to build any new tools to get started with that!  Instead, we'll change our approach:   Any time we would have displayed a message (using `format`), we will instead return a result to our main loop that it can use to display messages in one consistent place and fashion.
