@@ -19,18 +19,22 @@
 
 (defgeneric attack (component target))
 (defmethod attack ((component fighter) (target entity))
-  (let ((damage (- (fighter/power component) (fighter/defense (entity/fighter target)))))
+  (let ((results nil)
+        (damage (- (fighter/power component) (fighter/defense (entity/fighter target)))))
     (cond
       ((> damage 0)
-       (take-damage (entity/fighter target) damage)
-       (format t "~A attackt ~A, and deals ~A point in damage.~%"
-               (entity/name (component/owner component))
-               (entity/name target)
-               damage))
+       (setf results (append (list :message
+                                   (format nil "~A attackt ~A, and deals ~A point in damage.~%"
+                                             (entity/name (component/owner component))
+                                             (entity/name target)
+                                             damage))
+                             (take-damage (entity/fighter target) damage))))
+
       (t
-       (format t "~A attackt ~A, but does no damage.~%"
-               (entity/name (component/owner component))
-               (entity/name target))))))
+       (setf results (list :messge (format nil "~A attackt ~A, but does no damage.~%"
+                                           (entity/name (component/owner component))
+                                           (entity/name target))))))
+    results))
 
 (defclass basic-monster (component) ())
 

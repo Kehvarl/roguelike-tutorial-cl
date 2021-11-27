@@ -529,3 +529,29 @@ We'll start over in out `components` file, specifically with the `attack` and `t
     results))
 ```
 When an entity takes some damage, we check to see if its HP falls to 0 or below.  If so then we will return a list containing the keyword `:dead` and a reference to the entity.
+
+`attack`:
+```Lisp
+(defmethod attack ((component fighter) (target entity))
+  (let ((results nil)
+        (damage (- (fighter/power component) (fighter/defense (entity/fighter target)))))
+    (cond
+      ((> damage 0)
+       (setf results (append (list :message
+                                   (format nil "~A attackt ~A, and deals ~A point in damage.~%"
+                                             (entity/name (component/owner component))
+                                             (entity/name target)
+                                             damage))
+                             (take-damage (entity/fighter target) damage))))
+
+      (t
+       (setf results (list :messge (format nil "~A attackt ~A, but does no damage.~%"
+                                           (entity/name (component/owner component))
+                                           (entity/name target))))))
+    results))
+```
+Once we calculate the results of an attack, there are two possible outcomes:
+* The attacker deals some damage, in which case we will return a list that contains 2 parts:
+  * A list that contains the keyword `:message` and a pre-formatted string to indicate the results of the attack
+  * The results of calling `take-damage` on the target with the amount of damage to deal.
+* A list containing the keyword `:message` and a pre-formatted string indicating that no damage was dealt to the target.
