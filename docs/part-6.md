@@ -516,3 +516,16 @@ We've built a lot of pieces:  maps, entities, a component system, field-of-view,
 The first thing we're going to implement is a message system.  This will come in handy later when we want a more useful in-game log.
 
 Fortunately, we don't need to build any new tools to get started with that!  Instead, we'll change our approach:   Any time we would have displayed a message (using `format`), we will instead return a result to our main loop that it can use to display messages in one consistent place and fashion.
+
+We'll start over in out `components` file, specifically with the `attack` and `take-damage` methods.
+
+`take-damage`:
+```Lisp
+(defmethod take-damage ((component fighter) amount)
+  (decf (fighter/hp component) amount)
+  (let ((results nil))
+    (when (<= (fighter/hp component) 0)
+      (setf results (list :dead (component/owner component))))
+    results))
+```
+When an entity takes some damage, we check to see if its HP falls to 0 or below.  If so then we will return a list containing the keyword `:dead` and a reference to the entity.

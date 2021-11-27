@@ -11,7 +11,11 @@
 
 (defgeneric take-damage (component amount))
 (defmethod take-damage ((component fighter) amount)
-  (decf (fighter/hp component) amount))
+  (decf (fighter/hp component) amount)
+  (let ((results nil))
+    (when (<= (fighter/hp component) 0)
+      (setf results (list :dead (component/owner component))))
+    results))
 
 (defgeneric attack (component target))
 (defmethod attack ((component fighter) (target entity))
