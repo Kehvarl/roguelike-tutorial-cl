@@ -24,16 +24,16 @@
     (cond
       ((> damage 0)
        (setf results (append (list :message
-                                   (format nil "~A attackt ~A, and deals ~A point in damage.~%"
+                                   (format nil "~A attacks ~A, and deals ~A point in damage.~%"
                                              (entity/name (component/owner component))
                                              (entity/name target)
                                              damage))
                              (take-damage (entity/fighter target) damage))))
 
       (t
-       (setf results (list :messge (format nil "~A attackt ~A, but does no damage.~%"
-                                           (entity/name (component/owner component))
-                                           (entity/name target))))))
+       (setf results (list :message (format nil "~A attacks ~A, but does no damage.~%"
+                                            (entity/name (component/owner component))
+                                            (entity/name target))))))
     results))
 
 (defclass basic-monster (component) ())
@@ -47,7 +47,7 @@
       (cond ((>= (distance-to monster target) 2)
              (move-towards monster (entity/x target) (entity/y target) map entities))
             ((> (fighter/hp (entity/fighter target)) 0)
-             (setf results (attack (entity/fighter monster) target))))) 
+             (setf results (attack (entity/fighter monster) target)))))
     results))
 
 (defgeneric move-towards (e target-x target-y map entities))
