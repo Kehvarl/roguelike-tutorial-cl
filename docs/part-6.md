@@ -634,3 +634,12 @@ Our next modification to the game is to handle all those entities that fall belo
 
 #### New File
 We'll put all this work into a new file named `death-functions.lisp`  Go ahead and create that file, then add it to your .asd file.
+
+`kill-player`
+```lisp
+(defun kill-player (player)
+  (setf (entity/char player) #\%
+        (entity/color player) (blt:red))
+  (values "You died!" :player-dead))
+```
+This method accepts an entity, specifically the `player` entity, and sets the display character and color to something new that indicates a dead entity.  It then returns some text to display, and a keyword that we can use to set the game-state and end the game.
