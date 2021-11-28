@@ -538,14 +538,14 @@ When an entity takes some damage, we check to see if its HP falls to 0 or below.
     (cond
       ((> damage 0)
        (setf results (append (list :message
-                                   (format nil "~A attackt ~A, and deals ~A point in damage.~%"
+                                   (format nil "~A attacks ~A, and deals ~A point in damage.~%"
                                              (entity/name (component/owner component))
                                              (entity/name target)
                                              damage))
                              (take-damage (entity/fighter target) damage))))
 
       (t
-       (setf results (list :messge (format nil "~A attackt ~A, but does no damage.~%"
+       (setf results (list :message (format nil "~A attacks ~A, but does no damage.~%"
                                            (entity/name (component/owner component))
                                            (entity/name target))))))
     results))
@@ -628,3 +628,88 @@ For our first change to `game-tick` made sure to capture the messages sent from 
   game-state)
 ```
 Once again we're capturing the messages returned to us by each entity, and printing those if there are any.  We'll do something with those `:dead` results soon.
+
+### Death
+Our next modification to the game is to handle all those entities that fall below 0 HP.   We already identify them and pass them up to our `take-turn` method so we can react to them, so now we need to build some tools to handle those reactions:
+
+#### New File
+We'll put all this work into a new file named `death-functions.lisp`  Go ahead and create that file, then add it to your .asd file.
+
+`kill-player`
+```lisp
+(defun kill-player (player)
+  (setf (entity/char player) #\%
+        (entity/color player) (blt:red))
+  (values "You died!" :player-dead))
+```
+This method accepts an entity, specifically the `player` entity, and sets the display character and color to something new that indicates a dead entity.  It then returns some text to display, and a keyword that we can use to set the game-state and end the game.
+
+`kill-monster`
+```lisp
+(defun kill-monster (monster)
+  (with-slots (char color blocks ai name) monster
+    (let ((message (format nil "~A has died!~%" name)))
+      (setf char #\%
+            color (blt:red)
+            blocks nil
+            ai nil
+            name (format nil "remains of ~A" name))
+      message)))
+```
+Similar to the `kill-player` function, this one changes the symbol and color before returning some message about the dead monster. Since the game isn't over, we also make sure that corpses don't block tiles, don't try to take turns, and we update their name in case we need that later.
+
+#### Update Placeholders
+Now we have our tools for handling entity death, so we can return to our main file and replace those placeholders with calls to our new functions.
+
+`player-turn`
+```Lisp
+    (let ((message (getf player-turn-results :message))
+          (dead-entity (getf player-turn-results :dead)))
+      (when message
+        (format t message))
+      (when dead-entity
+        ;;Death Function Call Here
+        (cond ((equal dead-entity player)
+               (setf (values message game-state) (kill-player dead-entity)))
+              (t
+               (setf message (kill-monster dead-entity))))
+        (format t message)))
+```
+
+`enemy-turn`
+```Lisp
+(when (eql game-state :enemy-turn)
+  (dolist (entity (remove-if-not #'entity/ai entities))
+    (let* ((enemy-turn-results (take-turn (entity/ai entity) player map entities))
+           (message (getf enemy-turn-results :message))
+           (dead-entity (getf enemy-turn-results :dead)))
+      (when message
+        (format t message))
+      (when dead-entity
+        ;;Death Function Call Here
+        (cond ((equal dead-entity player)
+               (setf (values message game-state) (kill-player dead-entity)))
+              (t
+               (setf message (kill-monster dead-entity))))
+        (format t message)
+
+        (when (eql game-state :player-dead)
+          (return-from game-tick game-state)))))
+```
+If we run this we will get some errors because we haven't set things up to use that new `player-dead` state.   For a quick fix we'll make 2 changes:
+
+`game-states`
+```Lisp
+(deftype game-states () '(member :player-turn :enemy-turn :exit :player-dead))
+```
+First we add the new state to our allowed game-states list.
+
+`main`
+```Lisp
+(do ((game-state :player-turn (game-tick player entities map game-state)))
+    ((or (eql game-state :exit)(eql game-state :player-dead)))))))
+```    
+Then we make sure that the game knows to exit when it receives a `:player-dead` state.
+
+Compile it all, run main and...
+![Enter The Macabre](../screenshots/part-6-12-death.gif?raw=true "Actions have consequences.")

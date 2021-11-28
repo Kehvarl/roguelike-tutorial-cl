@@ -14,7 +14,7 @@
 (defparameter *max-rooms* 30)
 (defparameter *max-enemies-per-room* 5)
 
-(deftype game-states () '(member :player-turn :enemy-turn :exit))
+(deftype game-states () '(member :player-turn :enemy-turn :exit :player-dead))
 
 ;; Terminal Window Settings.
 (defun config ()
@@ -102,8 +102,13 @@
           (dead-entity (getf player-turn-results :dead)))
       (when message
         (format t message))
-      (when dead-entity))
-        ;; Nothing yet
+      (when dead-entity
+        (cond ((equal dead-entity player)
+               (setf (values message game-state) (kill-player dead-entity)))
+              (t
+               (setf message (kill-monster dead-entity))))
+        (format t message)))
+
 
 
     (when (eql game-state :enemy-turn)
@@ -113,8 +118,16 @@
                (dead-entity (getf enemy-turn-results :dead)))
           (when message
             (format t message))
-          (when dead-entity)))
-            ;; Nothing yet
+          (when dead-entity
+            (cond ((equal dead-entity player)
+                   (setf (values message game-state) (kill-player dead-entity)))
+                  (t
+                   (setf message (kill-monster dead-entity))))
+            (format t message)
+
+            (when (eql game-state :player-dead)
+              (return-from game-tick game-state)))))
+
       (setf game-state :player-turn)))
 
   game-state)
@@ -146,4 +159,4 @@
       (make-map map *max-rooms* *room-min-size* *room-max-size* *map-width* *map-height* player entities *max-enemies-per-room*)
       (fov map (entity/x player) (entity/y player))
       (do ((game-state :player-turn (game-tick player entities map game-state)))
-          ((eql game-state :exit))))))
+          ((or (eql game-state :exit)(eql game-state :player-dead)))))))

@@ -13,4 +13,5 @@
                (:file "entity")
                (:file "components")
                (:file "fov")
+               (:file "death-functions")
                (:file "roguelike-tutorial-cl")))
