@@ -657,3 +657,26 @@ This method accepts an entity, specifically the `player` entity, and sets the di
       message)))
 ```
 Similar to the `kill-player` function, this one changes the symbol and color before returning some message about the dead monster. Since the game isn't over, we also make sure that corpses don't block tiles, don't try to take turns, and we update their name in case we need that later.
+
+#### Update Placeholders
+Now we have our tools for handling entity death, so we can return to our main file and replace those placeholders with calls to our new functions.
+
+`player-turn`
+```Lisp
+    (let ((message (getf player-turn-results :message))
+          (dead-entity (getf player-turn-results :dead)))
+      (when message
+        (format t message))
+      (when dead-entity
+        ;;Death Function Call Here
+        (cond ((equal dead-entity player)
+               (setf (values message game-state) (kill-player dead-entity)))
+              (t
+               (setf message (kill-monster dead-entity))))
+        (format t message)))
+```
+
+`enemy-turn`
+```Lisp
+
+```

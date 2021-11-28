@@ -102,8 +102,13 @@
           (dead-entity (getf player-turn-results :dead)))
       (when message
         (format t message))
-      (when dead-entity))
-        ;; Nothing yet
+      (when dead-entity
+        (cond ((equal dead-entity player)
+               (setf (values message game-state) (kill-player dead-entity)))
+              (t
+               (setf message (kill-monster dead-entity))))
+        (format t message)))
+
 
 
     (when (eql game-state :enemy-turn)
