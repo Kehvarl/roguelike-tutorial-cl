@@ -572,3 +572,59 @@ Our `take-turn` method on the `basic-monster` component uses the `attack` method
     results))
 ```
 Just 3 modifications here: add a `results` variable to our `let`, change the attack call to store its output in that `results` variable, and return `results` for later use.
+
+And now we're ready to modify our game loop to deal with all these messages we're sending around:
+
+`game-tick`
+```Lisp
+(defun game-tick (player entities map game-state)
+  (declare (type game-states game-state))
+  (render-all entities map)
+  (let* ((player-turn-results nil)
+         (action (handle-keys))
+         (move (getf action :move))
+         (exit (getf action :quit)))
+
+    (when (and move (eql game-state :player-turn))
+      (let ((destination-x (+ (entity/x player) (car move)))
+            (destination-y (+ (entity/y player) (cdr move))))
+        (unless (blocked-p map destination-x destination-y)
+          (let ((target (blocking-entity-at entities destination-x destination-y)))
+            (cond (target
+                   (setf player-turn-results (attack (entity/fighter player) target)))
+                  (t
+                   (move player (car move) (cdr move))
+                   (fov map (entity/x player) (entity/y player))))
+            (setf game-state :enemy-turn)))))
+    (when exit
+      (setf game-state :exit))
+
+    (let ((message (getf player-turn-results :message))
+          (dead-entity (getf player-turn-results :dead)))
+      (when message
+        (format t message))
+      (when dead-entity))
+        ;; Nothing yet
+
+;;;... Continued Below
+```
+For our first change to `game-tick` made sure to capture the messages sent from attacking.  If a message is set, we print it at the end of the player's turn.   We've also set ourselves up to do something with the knowledge that an entity died, but we're not ready to use that yet.
+
+`game-tick`
+```Lisp
+;;;... Continued From above
+
+    (when (eql game-state :enemy-turn)
+      (dolist (entity (remove-if-not #'entity/ai entities))
+        (let* ((enemy-turn-results (take-turn (entity/ai entity) player map entities))
+               (message (getf enemy-turn-results :message))
+               (dead-entity (getf enemy-turn-results :dead)))
+          (when message
+            (format t message))
+          (when dead-entity)))
+            ;; Nothing yet
+      (setf game-state :player-turn)))
+
+  game-state)
+```
+Once again we're capturing the messages returned to us by each entity, and printing those if there are any.  We'll do something with those `:dead` results soon.
