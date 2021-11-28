@@ -628,3 +628,9 @@ For our first change to `game-tick` made sure to capture the messages sent from 
   game-state)
 ```
 Once again we're capturing the messages returned to us by each entity, and printing those if there are any.  We'll do something with those `:dead` results soon.
+
+### Death
+Our next modification to the game is to handle all those entities that fall below 0 HP.   We already identify them and pass them up to our `take-turn` method so we can react to them, so now we need to build some tools to handle those reactions:
+
+#### New File
+We'll put all this work into a new file named `death-functions.lisp`  Go ahead and create that file, then add it to your .asd file.
