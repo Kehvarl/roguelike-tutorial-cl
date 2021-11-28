@@ -643,3 +643,17 @@ We'll put all this work into a new file named `death-functions.lisp`  Go ahead a
   (values "You died!" :player-dead))
 ```
 This method accepts an entity, specifically the `player` entity, and sets the display character and color to something new that indicates a dead entity.  It then returns some text to display, and a keyword that we can use to set the game-state and end the game.
+
+`kill-monster`
+```lisp
+(defun kill-monster (monster)
+  (with-slots (char color blocks ai name) monster
+    (let ((message (format nil "~A has died!~%" name)))
+      (setf char #\%
+            color (blt:red)
+            blocks nil
+            ai nil
+            name (format nil "remains of ~A" name))
+      message)))
+```
+Similar to the `kill-player` function, this one changes the symbol and color before returning some message about the dead monster. Since the game isn't over, we also make sure that corpses don't block tiles, don't try to take turns, and we update their name in case we need that later.
