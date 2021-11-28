@@ -516,3 +516,115 @@ We've built a lot of pieces:  maps, entities, a component system, field-of-view,
 The first thing we're going to implement is a message system.  This will come in handy later when we want a more useful in-game log.
 
 Fortunately, we don't need to build any new tools to get started with that!  Instead, we'll change our approach:   Any time we would have displayed a message (using `format`), we will instead return a result to our main loop that it can use to display messages in one consistent place and fashion.
+
+We'll start over in out `components` file, specifically with the `attack` and `take-damage` methods.
+
+`take-damage`:
+```Lisp
+(defmethod take-damage ((component fighter) amount)
+  (decf (fighter/hp component) amount)
+  (let ((results nil))
+    (when (<= (fighter/hp component) 0)
+      (setf results (list :dead (component/owner component))))
+    results))
+```
+When an entity takes some damage, we check to see if its HP falls to 0 or below.  If so then we will return a list containing the keyword `:dead` and a reference to the entity.
+
+`attack`:
+```Lisp
+(defmethod attack ((component fighter) (target entity))
+  (let ((results nil)
+        (damage (- (fighter/power component) (fighter/defense (entity/fighter target)))))
+    (cond
+      ((> damage 0)
+       (setf results (append (list :message
+                                   (format nil "~A attackt ~A, and deals ~A point in damage.~%"
+                                             (entity/name (component/owner component))
+                                             (entity/name target)
+                                             damage))
+                             (take-damage (entity/fighter target) damage))))
+
+      (t
+       (setf results (list :messge (format nil "~A attackt ~A, but does no damage.~%"
+                                           (entity/name (component/owner component))
+                                           (entity/name target))))))
+    results))
+```
+Once we calculate the results of an attack, there are two possible outcomes:
+* The attacker deals some damage, in which case we will return a list that contains 2 parts:
+  * A list that contains the keyword `:message` and a pre-formatted string to indicate the results of the attack
+  * The results of calling `take-damage` on the target with the amount of damage to deal.
+* A list containing the keyword `:message` and a pre-formatted string indicating that no damage was dealt to the target.
+
+Our `take-turn` method on the `basic-monster` component uses the `attack` method, so let's update it to pass those messages back to the main loop.
+
+`take-turn`:
+```Lisp
+(defmethod take-turn ((component basic-monster) target map entities)
+  (let* ((results nil)
+         (monster (component/owner component))
+         (in-sight (tile/visible (aref (game-map/tiles map) (entity/x monster) (entity/y monster)))))
+    (when in-sight
+      (cond ((>= (distance-to monster target) 2)
+             (move-towards monster (entity/x target) (entity/y target) map entities))
+            ((> (fighter/hp (entity/fighter target)) 0)
+             (setf results (attack (entity/fighter monster) target)))))
+    results))
+```
+Just 3 modifications here: add a `results` variable to our `let`, change the attack call to store its output in that `results` variable, and return `results` for later use.
+
+And now we're ready to modify our game loop to deal with all these messages we're sending around:
+
+`game-tick`
+```Lisp
+(defun game-tick (player entities map game-state)
+  (declare (type game-states game-state))
+  (render-all entities map)
+  (let* ((player-turn-results nil)
+         (action (handle-keys))
+         (move (getf action :move))
+         (exit (getf action :quit)))
+
+    (when (and move (eql game-state :player-turn))
+      (let ((destination-x (+ (entity/x player) (car move)))
+            (destination-y (+ (entity/y player) (cdr move))))
+        (unless (blocked-p map destination-x destination-y)
+          (let ((target (blocking-entity-at entities destination-x destination-y)))
+            (cond (target
+                   (setf player-turn-results (attack (entity/fighter player) target)))
+                  (t
+                   (move player (car move) (cdr move))
+                   (fov map (entity/x player) (entity/y player))))
+            (setf game-state :enemy-turn)))))
+    (when exit
+      (setf game-state :exit))
+
+    (let ((message (getf player-turn-results :message))
+          (dead-entity (getf player-turn-results :dead)))
+      (when message
+        (format t message))
+      (when dead-entity))
+        ;; Nothing yet
+
+;;;... Continued Below
+```
+For our first change to `game-tick` made sure to capture the messages sent from attacking.  If a message is set, we print it at the end of the player's turn.   We've also set ourselves up to do something with the knowledge that an entity died, but we're not ready to use that yet.
+
+`game-tick`
+```Lisp
+;;;... Continued From above
+
+    (when (eql game-state :enemy-turn)
+      (dolist (entity (remove-if-not #'entity/ai entities))
+        (let* ((enemy-turn-results (take-turn (entity/ai entity) player map entities))
+               (message (getf enemy-turn-results :message))
+               (dead-entity (getf enemy-turn-results :dead)))
+          (when message
+            (format t message))
+          (when dead-entity)))
+            ;; Nothing yet
+      (setf game-state :player-turn)))
+
+  game-state)
+```
+Once again we're capturing the messages returned to us by each entity, and printing those if there are any.  We'll do something with those `:dead` results soon.
