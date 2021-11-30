@@ -713,3 +713,6 @@ Then we make sure that the game knows to exit when it receives a `:player-dead` 
 
 Compile it all, run main and...
 ![Enter The Macabre](../screenshots/part-6-12-death.gif?raw=true "Actions have consequences.")
+
+## Game State
+Before we move on, we should change how we handle the game state.  If we go back to our source documents we can see that they've implemented a whole new state system that we glossed over, and it's time to rectify that.   The new system will give us some more control over the game in its various states and make future expansion easier.
